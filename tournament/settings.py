@@ -25,7 +25,7 @@ SECRET_KEY = 'ahtw0!3*!@bvg*ozj3*ioa66(1g$gh@j4va2r1sm%oz01ga!ib'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['52.78.232.103']
+ALLOWED_HOSTS = ['52.78.234.49']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
@@ -87,10 +87,10 @@ WSGI_APPLICATION = 'tournament.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'tournament',
+        'NAME': 'mintonz',
         'USER': 'admin',
         'PASSWORD': 'roland305',
-        'HOST': 'touraws.cmwcdntyrrjs.ap-northeast-2.rds.amazonaws.com',
+        'HOST': 'mintonz.cmwcdntyrrjs.ap-northeast-2.rds.amazonaws.com',
         'PORT': '3306',
     }
 }
