@@ -7,6 +7,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 # Create your models here.
+#
 def get_image_path(instance, filename):
     path = instance.gameid + '-' + filename
     return os.path.join('static/img/poster', path)
