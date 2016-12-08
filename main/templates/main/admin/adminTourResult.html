@@ -1,0 +1,369 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+	.myMatchList .myMatchTable{width: 100%; text-align:center; border-collapse: collapse; border:1px solid #d0d0d0; font-size:14px}
+	.myMatchList .myMatchTable tr th{background-color: #86BCCB; padding: 10px; color:#FFFFFF; text-align:center;}
+	.myMatchList .myMatchTable tr td{padding: 5px;}
+	.myMatchList .myMatchTable tr td.matchId{width:5px; line-height:2.2;}
+	.myMatchList .myMatchTable tr td.playerNameA{border-left:0px; border-right:0px; padding-left:0px; text-align:center; line-height:2.2;}
+	.myMatchList .myMatchTable tr td.playerNameB{border-left:0px; padding-left:0px; padding-right:0px; text-align:center;line-height:2.2;}
+	.myMatchList .myMatchTable tr td.score{padding-left:0px; padding-right:0px; border-left:0px; border-right:0px; margin:auto;}
+	.myMatchList .myMatchTable tr td.versus{border-left:0; border-right:0; font-weight:bold; color:#CC0000;line-height:2.2;}
+	
+	.winner {color:red; font-weight:bold}
+	/*.player {}*/
+	input#score {display: block; margin: auto; font-family: sans-serif; font-weight: bold; font-size:110%; outline: 0; border: 1px solid #444; background: #f4f4f4; color: black; border-radius: 1px; text-align: center; box-shadow: 0 2px 8px #bbb, inset 0 0 0 1px white;}
+	input#score:focus {background: white;}
+</style>
+
+<script>
+	var tourid = '{{tourdetail.tourid}}';
+	var matches = '{{matches}}';
+	
+	function bigImage(fileName,winName,width,height){
+		var scrollYes="";
+		(width > 1024) ? scrollYes="yes" : scrollYes="no";
+		var winpage=window.open("",winName,"toolbar=no,scrollbars="+scrollYes+",resizable=no,width=" + width + ",height=" + height); 
+		
+		if(winpage != null){ 
+			var htmlcontent = "<html>"//+"<style> .body{background-repeat: no-repeat;} </style>"
+			+"<head><title>토너먼트</title>"
+			+ "</head><body style='background-repeat: no-repeat;' topmargin=0 leftmargin=0 background= "+ fileName + ">"
+			+ "<a onclick='self.close();'><div style='WIDTH:"+width+";HEIGHT:"+ height +";CURSOR:HAND;' title='클릭하면 창이 닫힙니다.'>"
+			+ "<div style='WIDTH:"+width+";BORDER:0px SOLID #FFFFFF;'>&nbsp;</div></div></a>"
+			+ "</body></html>";
+			winpage.document.open();
+			winpage.document.write(htmlcontent);
+			winpage.document.close();
+		}
+		
+		if(winpage != null) 
+		winpage.focus();
+		return winpage;
+	}	
+	
+	function toDataURL(){
+		var asd = document.getElementById("myCanvas");
+		bigImage(asd.toDataURL(),"새창",900,700);
+	}
+	
+	function onChange(value) {
+		var gameid = '{{game.gameid}}';
+		var tourid = value;
+		
+		$('#tourid').val(tourid);
+
+		var url = '/adminTourResult/' + gameid + '/' + tourid + '/';
+		location.href = url;
+	}
+	function isNumeric (evt) {
+		var theEvent = evt || window.event;
+	  	var key = theEvent.keyCode || theEvent.which;
+	  	key = String.fromCharCode (key);
+	    var regex = /[0-9]|\./;
+	    if ( !regex.test(key) ) {
+	    	theEvent.returnValue = false;
+	      	if(theEvent.preventDefault) {
+	      		theEvent.preventDefault();
+			}
+	    }
+	}
+	
+	function maxLengthCheck(object) {
+	    if (object.value.length > object.maxLength)
+	      object.value = object.value.slice(0, object.maxLength)
+	}
+			
+	function setGameResult(gameId, tourId, init) {
+		var jsonString = JSON.stringify($('#tourRes').serializeArray());
+		var jsonObject = JSON.parse(jsonString);
+		var teamcount = '{{tourdetail.teamcount}}';
+		var resultTempArr = new Array();
+		
+		console.log(jsonObject);
+		
+		for(var i=0; i<jsonObject.length; i++) {
+			
+			var splitChar = jsonObject[i]['name'].split("_");
+			var matchId   = splitChar[0];
+			var matchSeq  = splitChar[1];
+			var team 	  = splitChar[2];
+			var teamId 	  = splitChar[3];
+			var score 	  = jsonObject[i]['value'];
+			
+			if (init == true) {
+				score = "0";
+			} else if(teamId == "") {
+				score = "0";
+			}
+				
+			var matchKey = matchId + '_' + matchSeq;
+			var idx 	 = getArrayIndexByKey(resultTempArr,'matchKey', matchKey);
+					
+			if(idx == '-1') {
+				var middleArr = new Array();
+				middleArr['matchKey'] = matchKey;
+				middleArr['matchId'] = matchId;
+				middleArr['matchSeq'] = matchSeq;
+				
+				if(team == 'A') {
+					middleArr['team_a'] = teamId;
+					middleArr['team_b'] = "";
+					middleArr['team_a_score'] = score;
+					middleArr['team_b_score'] = "0";
+				} else {
+					middleArr['team_a'] = "";
+					middleArr['team_b'] = teamId;
+					middleArr['team_a_score'] = "0";
+					middleArr['team_b_score'] = score;
+				}
+				resultTempArr.push(middleArr);
+				
+			} else {
+				if(team == 'A') {
+					resultTempArr[idx]['team_a'] = teamId;
+					resultTempArr[idx]['team_a_score'] = score;
+				} else {
+					resultTempArr[idx]['team_b'] = teamId;
+					resultTempArr[idx]['team_b_score'] = score;
+				}
+			}
+		}
+				
+		var resultArr = new Array();
+		var errorFlag = "";
+		for(var i=0; i<resultTempArr.length; i++) {
+			if (resultTempArr[i]['team_a_score'] != "" && resultTempArr[i]['team_b_score'] != "") {
+				middleArr = new Object();
+				middleArr.matchKey = resultTempArr[i]['matchKey'];
+				middleArr.matchId = resultTempArr[i]['matchId'];
+				middleArr.matchSeq = resultTempArr[i]['matchSeq'];
+				middleArr.team_a = resultTempArr[i]['team_a'];
+				middleArr.team_b = resultTempArr[i]['team_b'];
+				middleArr.team_a_score = resultTempArr[i]['team_a_score'];
+				middleArr.team_b_score = resultTempArr[i]['team_b_score'];
+						
+				if (parseInt(resultTempArr[i]['team_a_score']) > parseInt(resultTempArr[i]['team_b_score'])) {
+					middleArr.winner = resultTempArr[i]['team_a'];
+				} else if (parseInt(resultTempArr[i]['team_a_score']) < parseInt(resultTempArr[i]['team_b_score'])) {
+					middleArr.winner = resultTempArr[i]['team_b'];
+				} else if (parseInt(resultTempArr[i]['team_a_score']) == parseInt(resultTempArr[i]['team_b_score'])) {
+					if (resultTempArr[i]['team_a_score'] == '0') {
+						middleArr.winner = "";
+					} else {
+						errorFlag = "equal";
+					}
+				}
+				resultArr.push(middleArr);
+			} 
+		}
+		
+		if (errorFlag == "") {
+			
+			if ( resultArr.length > 0) {
+		
+				makeMatchRule(teamcount);
+				
+				var newMatchList = g_matchRuleDB;
+						
+				var cleanedMatchList = new Array();
+						
+				for(var i=0; i<newMatchList.length; i++) {
+					if(newMatchList[i][0] != '0') {
+						var tempArr = [newMatchList[i][0],
+									   newMatchList[i][1],
+									   newMatchList[i][2],
+									   newMatchList[i][3],
+									   newMatchList[i][4]];
+										   
+						cleanedMatchList.push(tempArr);
+					}
+				}
+				
+				var nextMatchArr = new Array();
+				for(var i=0; i<resultArr.length; i++) {
+	
+					var middleArr = new Object();
+					var nextRuleKey = parseInt(resultArr[i]['matchId']) + 100;
+					var nextRuleId = getArrayIndexByValue(cleanedMatchList, nextRuleKey);
+				
+					if(nextRuleId != '-1') {
+						if( nextRuleKey == cleanedMatchList[nextRuleId][0] ) {
+							middleArr.teamLocation = 'team_a';
+						} else {
+							middleArr.teamLocation = 'team_b';
+						}
+								
+						middleArr.matchId = nextRuleId + 1;
+						middleArr.winner = resultArr[i]['winner'];
+						nextMatchArr.push(middleArr);
+					}
+				}
+						
+				var currentMatch = JSON.stringify(resultArr);
+				var nextMatch = JSON.stringify(nextMatchArr);
+																
+				//$('<form />',  {method:'POST', action:'manageGameResultProc.php', id:'gameResult'}).appendTo(document.body);
+				//$('<input />', {type:'hidden', name:'gameId', value:gameId}).appendTo('#gameResult');
+				//$('<input />', {type:'hidden', name:'tourId', value:tourId}).appendTo('#gameResult');
+				//$('<input />', {type:'hidden', name:'currentMatch', value:currentMatch}).appendTo('#gameResult');
+				//$('<input />', {type:'hidden', name:'nextMatch', 	value:nextMatch	  }).appendTo('#gameResult');
+				//$('#gameResult').submit();
+				
+				$.ajax({
+					type : 'POST',
+					url : '/adminTourResultProc/',
+					data : {
+						gameid : gameId,
+						tourid : tourId,
+						currentMatch : currentMatch,
+						nextMatch : nextMatch,
+						"csrfmiddlewaretoken": "{{ csrf_token }}",
+					}
+				}).done(function(responseText) {
+					var url = '/adminTourResult/' + gameId + '/' + tourId + '/';
+            		location.href = url;
+					
+				}).always(function() {
+	
+				}).error(function(request, status, error) {
+					alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+				});
+			} else {
+				alert("경기 결과가 입력되지 않았습니다");
+			}
+		} else {
+			if(errorFlag == "equal") {
+				alert("무승부는 등록할 수 없습니다");
+			} else if(errorFlag = "empty") {
+				alert("빈 경기에 결과를 입력할 수 없습니다");
+			}
+		}
+	}
+	
+	$(function() {
+		$('#initMatchList').click(function(event) {
+			event.preventDefault();
+			var gameid = '{{game.gameid}}';
+			var tourid = '{{tourdetail.tourid}}';
+			
+			if (confirm("경기 이력을 초기화 하시겠습니까?") == false) {
+                return false;
+            }
+			
+			setGameResult(gameid, tourid, true);
+		});
+		
+		$('#setMatchResult').click(function(event) {
+			event.preventDefault();
+			var gameid = '{{game.gameid}}';
+			var tourid = '{{tourdetail.tourid}}'
+			
+			if (confirm("경기 결과를 확정 하시겠습니까?") == false) {
+                return false;
+            }
+			console.log(gameid + tourid);
+			setGameResult(gameid, tourid, false);
+		});
+	});
+</script>
+<div class="container">
+    <ol class="breadcrumb">
+        <li><a href='/adminGame/{{game.gameid}}/'>기본정보</a></li>
+        <li><a href='/adminTour/{{game.gameid}}/'>토너먼트</a></li>
+        <li class="active"><a href='/adminTourResult/{{game.gameid}}/init/'><b>결과입력</b></a></li>
+        <li><a href='/adminGameTeam/{{game.gameid}}/'>선수관리</a></li>
+    </ol>
+    <h2>토너먼트 결과입력</h2>
+    <br>
+    <div class="form-group">
+        <label for="sel1">토너먼트 선택</label>
+        <select class="form-control" name="tourList" id="tourList" onchange="onChange(this.value)">
+            <option value='init'>토너먼트를 선택하세요</option>
+            {% for tour in tours %}
+    		{% if tour.tourid == tourdetail.tourid %}
+    		<option selected="selected" value={{tour.tourid}}>{{tour.tourname}}</option>
+    		{% else %}
+    		<option value={{tour.tourid}}>{{tour.tourname}}</option>
+    		{% endif %}
+    		{% endfor %}
+        </select>
+    </div>
+    <form action="/tourMain/{{game.gameid}}/" method="post" id="tourDetail" rel>
+        {% csrf_token %}
+        <input type="hidden" class="form-control" id="tourid" name="tourid">
+    </form>
+    
+    {% if matches %}
+    <button class="btn btn-primary btn-block" onclick="toDataURL();">크게보기</button>
+    <br>
+    <div class="form-group" align="center">
+    	{% if tourdetail.teamcount < 17 %}
+    	<canvas id="myCanvasvisible" width="325" height="160" style="border: 1px solid black;">
+    	<canvas id="myCanvas" width="900" height="400" style=" border: 1px solid black;">
+    	{% elif tourdetail.teamcount >= 17 and tourdetail.teamcount < 22 %}
+    	<canvas id="myCanvasvisible" width="360" height="280" style="border: 1px solid black;">
+    	<canvas id="myCanvas" width="900" height="700" style=" border: 1px solid black;">
+    	{% elif tourdetail.teamcount >= 22 and tourdetail.teamcount < 25 %}
+    	<canvas id="myCanvasvisible" width="360" height="280" style="border: 1px solid black;">
+    	<canvas id="myCanvas" width="900" height="700" style=" border: 1px solid black;">
+    	{% elif tourdetail.teamcount >= 25 %}
+    	<canvas id="myCanvasvisible" width="360" height="280" style="border: 1px solid black;">
+    	<canvas id="myCanvas" width="900" height="700" style=" border: 1px solid black;">
+    	{% endif %}
+    	<script>
+    		var results = JSON.parse('{{results|safe}}');
+    		var gamename = '{{game.gamename}}';
+    		var tourname = '{{tourdetail.tourname}}';
+    		DrawTourByMatchAtManage(results, 0, "", gamename, tourname);
+    		DrawTourByMatchAtManage(results, 1, "", gamename, tourname);
+    	</script>
+	</div>
+	{% endif %}
+    
+    {% if matches %}
+    <div data-role="content" class="ui-content">
+	<div class="myMatchList" align="center">
+		<form enctype="multipart/form-data" method="POST" id="tourRes">
+			<table class="myMatchTable" border="1px">
+				<tr>
+					<th class="matchId">No.</th>
+					<th colspan="5">매치</th>
+				</tr>
+				{% for match in matches %}
+				<tr>
+					<td class="matchId"><span>{{match.matchid}}</span></td>
+					<td class="playerNameA">
+						{% if match.team_a == match.winner %}
+						<div class="winner">{{match.team_a_obj.teamname}}</div></td>
+						{% else %}
+						<div class="player">{{match.team_a_obj.teamname}}</div></td>
+						{% endif %}
+					<td class="score"><span><input type="number" value={{match.team_a_score}} pattern='[0-9]*' name='{{match.matchid}}_{{match.matchseq}}_A_{{match.team_a}}' id="score" onkeypress="return isNumeric(event)" oninput="maxLengthCheck(this)" maxlength = "2" min = "0" max = "99"/></span></td>
+					<td class="versus">VS</td>
+					<td class="score"><span><input type="number" value={{match.team_b_score}} pattern='[0-9]*' name='{{match.matchid}}_{{match.matchseq}}_B_{{match.team_b}}' id="score" onkeypress="return isNumeric(event)" oninput="maxLengthCheck(this)" maxlength = "2" min = "0" max = "99"/></span></td>
+					<td class="playerNameB">
+						{% if match.team_b == match.winner %}
+						<div class="winner">{{match.team_b_obj.teamname}}</div></td>
+						{% else %}
+						<div class="player">{{match.team_b_obj.teamname}}</div></td>
+						{% endif %}
+				</tr>
+				{% endfor %}
+			</table>
+		</form>
+		<br>
+		<button type="button" class="btn btn-primary btn-block" id="setMatchResult">결과확정</button>
+		<button type="button" class="btn btn-warning btn-block" id="initMatchList">초기화</button>
+		<br>
+	</div>
+</div>
+    {% endif %}
+</div>
+{% endblock %}

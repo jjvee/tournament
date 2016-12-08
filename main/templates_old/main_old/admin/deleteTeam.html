@@ -1,0 +1,115 @@
+
+{% extends "main/base.html" %}
+{% block title %}
+대회메인
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+
+<style>
+	#navText{font-size: 12px;}
+	.teamlist{width: 100%; text-align:center; border-collapse: collapse; border:1px solid #d0d0d0; font-size:14px}
+	.teamlist tr th{background-color: #86BCCB; padding: 10px; color:#FFFFFF;}
+	.teamlist tr td{padding:5px; padding:10px;}
+	
+	/*.teamlist #check{text-align:center; vertical-align:center;}*/
+	.teamlist #teamname{text-align:left; vertical-align:center;}
+	
+	.row1 { background: #fff; }
+    .row2 { background: #f9f9f9; }
+</style>
+<script>
+	$(function() {
+		$('#delButton').click(function(event) {
+			event.preventDefault();
+			if (confirm("참가자 삭제를 확정 하시겠습니까? \n (삭제 대상관련 토너먼트 및 경기이력은 삭제됩니다") == false) {
+                return false;
+            }
+			
+			var teamArray = [];
+			$("table#teamlist tr").each(function() {
+			    var middleArr = new Object();
+			    var tableData = $(this).find('input#checkbox');
+			    if (tableData.length > 0) {
+			        tableData.each(function() {
+			        	if($(this)[0].checked == true) {
+			        		middleArr['check'] = $(this)[0].checked;
+			        		middleArr['teamid'] = $(this)[0].value;	
+			        		teamArray.push(middleArr);
+			        	}
+			        });
+			    }
+			});
+			
+			if (teamArray.length < 1) {
+				alert("선택한 팀이 없습니다");
+				return false;
+			}
+			
+			var gameId = '{{game.gameid}}';
+			var teamListString = JSON.stringify(teamArray);
+			
+			console.log(teamArray);
+			
+			$.ajax({
+			type : 'POST',
+      		url : '/deleteTeamProc/',
+      		data : {
+      			gameId : gameId,
+      			teamList : teamListString,
+      			"csrfmiddlewaretoken": '{{ csrf_token }}',
+      		}
+      		}).done(function(responseText) {
+          	    if (responseText) {
+          	        var url = '/adminGameTeam/' + gameId;
+            	    location.href = url;
+          	    }
+          	    
+      		}).always(function() {
+      		
+      		}).error(function(request, status, error) {
+      		    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      		});
+		});
+	});
+</script>
+
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+      <ul>
+        <li><a href='/adminGame/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">기본정보</span></a></li>
+			  <li><a href='/adminTour/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href='/adminTourResult/{{game.gameid}}/init/' rel="external", data-ajax="false"><span id="navText">결과입력</span></a></li>
+		    <li><a href='/adminGameTeam/{{game.gameid}}/' class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">선수관리</span></a></li>
+  		</ul>
+  	</div>				
+</div>
+
+<div data-role="main" class="ui-content">
+    <button class="btn btn-warning btn-block" name="deleteTeam" id="delButton" data-theme="d">삭제확정</button>
+    <br>
+	<table id="teamlist" class="teamlist">
+	    <colgroup>
+			<col width="15%">
+			<col width="85%">
+		</colgroup>
+	    <tr>
+	        <th>선택</th>
+	        <th>팀명</th>
+	    </tr>
+		
+	    {% for team in teams %}
+	    <tr class='{{rowidx}}'>
+	        <td id="check">
+	            <input id="checkbox" class='custom-checkbox' data-toggle="checkbox" type='checkbox' value='{{team.teamid}}'>
+	        </td>
+	        <td id="teamname">{{team.teamname}}</td>
+	    </tr>
+	    {% endfor %}
+
+	</table>
+</div>
+
+{% endblock %}

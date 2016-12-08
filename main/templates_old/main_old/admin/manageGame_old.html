@@ -1,0 +1,18 @@
+{% extends "main/base.html" %}
+{% block title %}
+대회관리
+{% endblock %}
+
+{% block content %}
+<div data-role="main" class="ui-content">
+    <form action = "/createGame/" method="post">
+        {% csrf_token %}
+        <button class="btn btn-warning btn-block" name="createGame" data-theme="e">신규대회생성</button>
+    </form>
+    <form action = "/searchAdminGame/" method="post">
+        {% csrf_token %}
+        <button class="btn btn-warning btn-block" name="searchAdminGame">기존대회관리</button>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,111 @@
+
+{% extends "main/base.html" %}
+{% block title %}
+Board
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<script>
+	$(function() {
+        $('#deleteArticle').click(function(event) {
+            event.preventDefault();
+            
+            if (confirm("작성글을 삭제 하시겠습니까?") == false) {
+                return false;
+            }
+            
+            var boardType = "{{boardtype}}";
+            var boardId = "{{board.id}}";
+            var gameId = "{{gameid}}";
+            
+            $.ajax({
+      				type : 'POST',
+      				url : '/boardDeleteProc/',
+      				data : {
+      					boardType : boardType,
+      					boardId : boardId,
+      					gameid : gameId,
+      					"csrfmiddlewaretoken": "{{ csrf_token }}",
+      				}
+      		    	}).done(function(responseText) {
+          			    if (responseText == "ok") {
+          			        var url = '/boardList/' + boardType + '/' + gameId + '/';
+            			    location.href = url;
+          			    } else {
+          			    	alert("작성자 본인의 글만 삭제 할 수 있습니다");
+          			    }
+          			    
+      			    }).always(function() {
+      			
+      			    }).error(function(request, status, error) {
+      				    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      			    });
+        });
+    });
+</script>
+<style type="text/css">
+	.mtb{
+		background-color:#51b8c9;
+		color:#fff;
+		font-weight:bold;
+		text-align:center;
+		height:25px;
+		width:150px;
+	}
+	.mco{
+		padding-left:5px;
+	}
+	.spantitle{
+		display: inline-block;
+		color: #676767;
+		font-weight:bold;
+	}
+	.cont { background-color: #F6F6F6; padding:15px}
+</style>
+{% if boardtype == 'game' %}
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+        <ul>
+            <li><a href='/gameMain/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">대회메인</span></a></li>
+			<li><a href='/tourMain/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href="/boardList/game/{{game.gameid}}/" class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">게시판</span></a></li>
+		</ul>
+	</div>
+</div>
+{% endif %}		
+<div data-role="main" class="ui-content">
+	<div><h2>{{boardtypetext}}</h2></div>
+	
+	<div id="container">
+		<section id="contents" class="mainPage">
+			<table width="100%" border="0" cellSpacing="2" cellPadding="0">
+				<tbody>
+					<tr>
+						<td class="mtb">작 성 자</td>
+						<td class="mco">{{board.insertuser.first_name}}</td>
+					</tr>
+					<tr>
+						<td class="mtb">제&nbsp;&nbsp;목</td>
+						<td class="mco">{{board.title}}</td>
+					</tr>
+					<tr>
+						<td class="mtb">작 성 일</td>
+						<td class="mco">{{board.insertdate}}</td>
+					</tr>
+					<tr>
+						<td colspan="2"><br><div class="cont"><textarea name="content" readonly>{{board.cont}}</textarea></div></td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+		<br>
+		{% if owner == True %}
+		<button class="btn btn-primary btn-block" id="modifyArticle" name="modifyArticle" onclick="location.href='/boardModify/{{boardtype}}/{{gameid}}/{{board.id}}'">수정</button>
+		<button class="btn btn-warning btn-block" id="deleteArticle" name="deleteArticle" data-theme="d">삭제</button>
+		{% endif %}
+	</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<head>
+	<title>{% block title %}{% endblock %}</title>
+	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+
+  	{% load static %}
+  	<!-- JS -->
+  	<script type="text/javascript" src="{% static "js/game/game.js" %}"></script>
+  	<script type="text/javascript" src="{% static "js/util/common.js" %}"></script>
+  	<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+  	<script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+  	<!-- CSS -->
+  	<link rel="stylesheet" type="text/css" href="{% static "css/layout_mobile.css" %}" />
+ 	<link rel="stylesheet" type="text/css" href="{% static "css/flatui/jquery.mobile.flatui.css" %}" />
+
+  	<style>
+  		#mainLogoArea{width: inherit; margin: 0 auto; text-align: center; padding: 5px}
+		#mainLogoArea img{max-width: 250px; height: auto;}
+	</style>
+</head>
+<body>
+<div data-role="page">
+	<div data-role="panel" id="mainPanel" data-position="left" data-display="overlay">
+		<ul data-role="listview">
+			<li>
+				<a href="{% url 'main:home' %}" rel="external" data-ajax="false">메인화면</a>
+			</li>
+			<li>
+				<a href="/searchGame" rel="external" data-ajax="false">대회검색</a>
+			</li>
+			<li>
+				<a href="/searchAdminGame" rel="external" data-ajax="false">대회관리</a>
+			</li>
+			<li>
+				<a href="/boardList/notice/all" rel="external", data-ajax="false">공지사항</a>
+			</li>
+			<li>
+				<a href="/boardList/free/all" rel="external", data-ajax="false">자유게시판</a>
+			</li>
+			<li>
+				<a href="/boardList/qna/all" rel="external", data-ajax="false">Q&A</a>
+			</li>
+		</ul>
+	</div>
+	<div data-role="header" data-theme="b">
+		<a href="#mainPanel" data-icon="flat-menu" data-iconpos="notext" data-inline="true" data-theme="b"></a>
+		<h2>
+			<img id="headerLogo" src="{% static "img/logo/mintonz_logo_white.png" %}"/>
+		</h2>
+		{% if user.is_authenticated %}
+		<a href="/logout" id="loginBtn" data-icon="flat-man" data-inline="true">로그아웃</a>
+		{% else %}
+		<a href="/login" id="loginBtn" data-icon="flat-man" data-inline="true">로그인</a>
+		{% endif %}
+	</div>
+	{% block content %}{% endblock %}
+</div>
+
+</body>

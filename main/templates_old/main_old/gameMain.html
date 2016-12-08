@@ -1,0 +1,78 @@
+
+{% extends "main/base.html" %}
+{% block title %}
+대회메인
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+
+<style>
+	#GameGeneralInfo { border-collapse: collapse; background-color: #FFFFFF }
+	#GameGeneralInfo tr th{text-align: center; background-color: #BDBDBD; padding: 5px}
+	#GameGeneralInfo tr td{padding: 5px}
+	#GamePoster{width: inherit; margin: 0 auto; text-align: center; padding: 5px; background-color: #FFFFFF}
+	#GamePoster img{max-width: 200px; height: auto;}
+	#navText{font-size: 12px;}
+</style>
+
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+        <ul>
+            <li><a href='/gameMain/{{game.gameid}}/' class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">대회메인</span></a></li>
+			<li><a href='/tourMain/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href="/boardList/game/{{game.gameid}}/" rel="external", data-ajax="false"><span id="navText">게시판</span></a></li>
+		</ul>
+	</div>				
+</div>
+
+<div data-role="main" class="ui-content">
+	<table id="GamePoster">
+		<tr>
+			<td>
+				<img src="{% static "img/poster/gorani20151201_poster.png" %}">
+			</td>
+		</tr>
+	</table>
+				
+	<table id="GameGeneralInfo" border="1" align="center">
+		<colgroup>
+			<!--<col width="25%">-->
+			<!--<col width="75%">-->
+		</colgroup>
+		<tbody>
+			<tr>
+				<th>대회명</th>
+				<td id="gameName">{{game.gamename}}</td>
+			</tr>
+			<tr>
+				<th>개최자</th>
+				<td id="owner">{{game.owner}}</td>
+			</tr>
+			<tr>
+				<th>지역</th>
+				<td id="region">{{game.region}}</td>
+			</tr>
+			<tr>
+				<th>대회기간</th>
+				<td id="gamePeriod">{{game.begindate.year}}.{{game.begindate.month}}.{{game.begindate.day}} ~ 
+				{{game.enddate.year}}.{{game.enddate.month}}.{{game.enddate.day}}</td>
+			</tr>
+			<tr>
+				<th>부수</th>
+				<td id="class">{{game.gameclass}}</td>
+			</tr>
+			<tr>
+				<th>급수</th>
+				<td id="level">{{game.level}}</td>
+			</tr>
+			<tr>
+				<th>종목</th>
+				<td id="gender">{{game.gender}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+{% endblock %}

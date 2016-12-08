@@ -1,0 +1,140 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+
+{% block content %}
+<script>
+    $(function() {
+    	
+    	$('#gamename').val('{{game.gamename}}');
+    	$('#region').val('{{game.region}}');
+    	$('#owner').val('{{game.owner}}');
+    	$('#entryfee').val('{{game.entryfee}}');
+    	$('#begindate').val('{{begindate}}');
+    	$('#enddate').val('{{enddate}}');
+    	$('#stadium').val('{{game.stadium}}');
+    	
+      $('#modifyGame').click(function(event) {
+          event.preventDefault();
+          
+          var gameid = '{{game.gameid}}';
+          var gamename = $('#gamename').val();
+          var region = $('#region').val();
+          var owner = $('#owner').val();
+          var entryfee = $('#entryfee').val();
+          var begindate = $('#begindate').val();
+          var enddate = $('#enddate').val();
+          var stadium = $('#stadium').val();
+          
+          if (gamename == '') {
+              alert('대회명은 필수입니다');
+              return false;
+          };
+          
+          $.ajax({
+          			type : 'POST',
+          			url : '/modifyGame/',
+          			data : {
+          			  gameid : gameid,
+          				gamename : gamename,
+          				region : region,
+          				owner : owner,
+          				entryfee : entryfee,
+          				begindate : begindate,
+          				enddate : enddate,
+          				stadium : stadium,
+          				"csrfmiddlewaretoken": "{{ csrf_token }}",
+          			}
+        		  	}).done(function(responseText) {
+            		    if (responseText) {
+            		        alert('대회정보 변경을 완료 하였습니다');
+            		        var url = '/adminGame/' + responseText;
+              		      location.href = url;
+            		    }
+            		    
+        			  }).always(function() {
+        			
+        			  }).error(function(request, status, error) {
+        			    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+        			  });
+      });
+      
+      $('#deleteGame').click(function(event) {
+          event.preventDefault();
+          
+          if (confirm("대회를 삭제 하시겠습니까?") == false) {
+                return false;
+          }
+          
+          var gameid = '{{game.gameid}}';
+          
+          $.ajax({
+          			type : 'POST',
+          			url : '/deleteGame/',
+          			data : {
+          			  gameid : gameid,
+          				"csrfmiddlewaretoken": "{{ csrf_token }}",
+          			}
+        		  	}).done(function(responseText) {
+            		    if (responseText) {
+            		        var url = '/searchAdminGame/';
+              		      location.href = url;
+            		    }
+            		    
+        			  }).always(function() {
+        			
+        			  }).error(function(request, status, error) {
+        			    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+        			  });
+      });
+    });
+</script>
+<div class="container">
+    <ol class="breadcrumb">
+        <li class="active"><a href='/adminGame/{{game.gameid}}/'><b>기본정보</b></a></li>
+        <li><a href='/adminTour/{{game.gameid}}/'>토너먼트</a></li>
+        <li><a href='/adminTourResult/{{game.gameid}}/init/'>결과입력</a></li>
+        <li><a href='/adminGameTeam/{{game.gameid}}/'>선수관리</a></li>
+    </ol>
+    
+    <div><h2>기본정보</h2></div>
+    <br>
+    
+    <form action = "/modifyGame/" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="gamename">대회명</label>
+          <input type="text" class="form-control" id="gamename" name="gamename">
+        </div>
+        <div class="form-group">
+          <label for="region">지역</label>
+          <input type="text" class="form-control" id="region" name="region">
+        </div>
+        <div class="form-group">
+          <label for="owner">개최자</label>
+          <input type="text" class="form-control" id="owner" name="owner">
+        </div>
+        <div class="form-group">
+          <label for="owner">참가비</label>
+          <input type="number" class="form-control" id="entryfee" name="entryfee">
+        </div>
+        <div class="form-group">
+          <label for="begindate">개최일</label>
+          <input type="date" class="form-control" id="begindate" name="begindate">
+        </div>
+        <div class="form-group">
+          <label for="enddate">종료일</label>
+          <input type="date" class="form-control" id="enddate" name="enddate">
+        </div>
+        <div class="form-group">
+          <label for="stadium">대회장소</label>
+          <input type="text" class="form-control" id="stadium" name="stadium">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="modifyGame" name="modifyGame">정보수정</button>
+        <button type="button" class="btn btn-warning btn-block" id="deleteGame" name="deleteGame">대회삭제</button>
+    </form>
+    <br>
+</div>
+{% endblock %}

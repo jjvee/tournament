@@ -1,0 +1,87 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+
+{% block content %}
+<script>
+	$(function() {
+        $('#modifyArticle').click(function(event) {
+            event.preventDefault();
+            
+            if (confirm("작성 완료 하시겠습니까?") == false) {
+                return false;
+            }
+            
+            var title = $('#title').val();
+            var cont = $('#cont').val();
+            var boardType = "{{boardtype}}";
+            var gameId    = "{{gameid}}";
+            var boardId   = "{{board.id}}";
+            
+            if (title == '') {
+                alert('제목은 필수입니다');
+                return false;
+            };
+            
+            $.ajax({
+      				type : 'POST',
+      				url : '/boardModifyProc/',
+      				data : {
+      					title : title,
+      					cont : cont,
+      					boardType : boardType,
+      					gameId : gameId,
+      					boardId : boardId,
+      					"csrfmiddlewaretoken": "{{ csrf_token }}",
+      				}
+      		    	}).done(function(responseText) {
+      		    	    if (responseText == "ok") {
+          			        var url = '/boardList/' + boardType + '/' + gameId + '/';
+            			    location.href = url;
+          			    } else {
+          			    	alert("작성자 본인의 글만 수정 할 수 있습니다");
+          			    }
+      			    }).always(function() {
+      			
+      			    }).error(function(request, status, error) {
+      				    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      			    });
+        });
+    });
+</script>
+{% if owner == False %}
+<script>
+    alert("잘못된 접근입니다");
+    location.href = '/';
+</script>
+{% endif %}
+<div class="container">
+  {% if boardtype == 'game' %}
+  <ol class="breadcrumb">
+    <li><a href="/gameMain/{{game.gameid}}/">대회메인</a></li>
+    <li><a href="/tourMain/{{game.gameid}}/">토너먼트</a></li>
+    <li class="active"><a href="/boardList/game/{{game.gameid}}/"><b>게시판</b></a></li>
+  </ol>
+  {% endif %}
+  <div><h2>{{boardtypetext}}</h2></div>
+  <br>
+  
+  <div class="form-group">
+    <label for="insertuser">작성자</label>
+    <input class="form-control" id="insertuser" name="insertuser" type="text" value="{{board.insertuser.first_name}}" disabled>
+  </div>
+  
+  <div class="form-group">
+    <label for="title">제목</label>
+      <input class="form-control" id="title" name="title" type="text" value="{{board.title}}">
+  </div>
+  
+  <div class="form-group">
+    <label for="cont">내용</label>
+    <textarea class="form-control" rows="10" id="cont" name="cont">{{board.cont}}</textarea>
+  </div>
+  <button class="btn btn-primary btn-block" id="modifyArticle" name="modifyArticle">수정</button>
+</div>
+{% endblock %}

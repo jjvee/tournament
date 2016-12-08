@@ -1,0 +1,113 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+{% block content %}
+<script>
+    $(function() {
+        $('#gamename').val('{{game.gamename}}');
+        $('#createNewTour').click(function(event) {
+            event.preventDefault();
+            
+            var gameid = '{{game.gameid}}';
+            var tourid = '{{tour.tourid}}';
+            var tourname = $('#tourname').val();
+            var teamcount = $('#teamcount').val();
+            
+            var oldcount = '{{tour.teamcount}}';
+            
+            if (tourname == '') {
+                alert('토너먼트명은 필수입니다');
+                return false;
+            };
+            
+            if (teamcount == '') {
+                alert('참가팀수는 필수입니다');
+                return false;
+            };
+            
+            console.log(teamcount + "/" + oldcount)
+            
+            if (teamcount != oldcount) {
+              if (confirm("참가팀수가 바뀌면 토너먼트 정보가 초기화 됩니다. 진행하시겠습니까?") == false) {
+                return false;
+              }  
+            }
+            
+            $.ajax({
+      				type : 'POST',
+      				url : '/adminTourInfoProc/',
+      				data : {
+      				  gameid : gameid,
+      				  tourid : tourid,
+      					tourname : tourname,
+      					teamcount : teamcount,
+      					"csrfmiddlewaretoken": "{{ csrf_token }}",
+      				}
+      		    	}).done(function(responseText) {
+          			    if (responseText) {
+          			        var url = '/adminTourDetail/' + '{{game.gameid}}' + '/' + '{{tour.tourid}}';
+            			      location.href = url;
+          			    }
+          			    
+      			    }).always(function() {
+      			
+      			    }).error(function(request, status, error) {
+      				    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      			    });
+        })
+        $('#deleteTour').click(function(event) {
+          event.preventDefault();
+          if (confirm("토너먼트를 삭제 하시겠습니까?") == false) {
+            return false;
+          }
+          
+          var gameid = '{{game.gameid}}';
+          var tourid = '{{tour.tourid}}';
+          
+          $.ajax({
+      				type : 'POST',
+      				url : '/deleteTourProc/',
+      				data : {
+      				  gameid : gameid,
+      				  tourid : tourid,
+      					"csrfmiddlewaretoken": "{{ csrf_token }}",
+      				}
+      		    	}).done(function(responseText) {
+          			    if (responseText) {
+          			        alert('토너먼트 삭제를 완료하였습니다');
+          			        var url = '/adminTour/' + '{{game.gameid}}' + '/';
+            			      location.href = url;
+          			    }
+          			    
+      			    }).always(function() {
+      			
+      			    }).error(function(request, status, error) {
+      				    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      			    });
+        });
+    });
+</script>
+<div class="container">
+    <ol class="breadcrumb">
+        <li><a href='/adminGame/{{game.gameid}}/'>기본정보</a></li>
+        <li class="active"><a href='/adminTour/{{game.gameid}}/'><b>토너먼트</b></a></li>
+        <li><a href='/adminTourResult/{{game.gameid}}/init/'>결과입력</a></li>
+        <li><a href='/adminGameTeam/{{game.gameid}}/'>선수관리</a></li>
+    </ol>
+    
+    <h2><b>{{game.gamename}}</b></h2>
+    <br>
+    <div class="form-group">
+      <label for="tourname">토너먼트명</label>
+      <input type="text" class="form-control" id="tourname" name="tourname" value='{{tour.tourname}}'>
+    </div>
+    <div class="form-group">
+      <label for="teamcount">참가팀수</label>
+      <input type="number" class="form-control" id="teamcount" name="teamcount" value='{{tour.teamcount}}'>
+    </div>
+    <button type="button" class="btn btn-primary btn-block" id="createNewTour" name="createNewTour">토너먼트 저장</button>
+    <button type="button" class="btn btn-warning btn-block" name="deleteTour" id="deleteTour">토너먼트 삭제</button>
+</div>
+{% endblock %}

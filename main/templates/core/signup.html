@@ -1,0 +1,118 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+
+{% block content %}
+<style>
+    .input-group {padding:4px; padding-left:0px; padding-right:0px;}
+</style>
+<script>
+    function validateEmail(elementValue){         
+       var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;   
+       return emailPattern.test(elementValue);    
+    }
+    
+    function chkPwd(str){
+        var reg_pwd = /^.*(?=.{6,20})(?=.*[0-9])(?=.*[a-zA-Z]).*$/;
+        if(!reg_pwd.test(str)){
+            return false;
+        }
+        return true;
+    }
+    
+	$(function() {
+        $('#signup').click(function(event) {
+            event.preventDefault();
+            
+            if( $('#email').val() == ""){
+                alert("E-Mail은 필수입니다");
+                return false;
+            }
+            
+            if( $('#name').val() == ""){
+                alert("이름은 필수입니다");
+                return false;
+            }
+            
+            if( $('#pw').val() == "" || $('#pw2').val() == ""){
+                alert("비밀번호는 필수입니다");
+                return false;
+            }
+            
+            if( $('#pw').val() != $('#pw2').val()) {
+                alert('비밀번호가 일치하지 않습니다');
+                return false;
+            }
+            
+            // checkEmail = ;
+            
+            if( validateEmail($('#email').val()) == false ) {
+                alert('올바른 이메일 형식이 아닙니다');
+                return false;
+            }
+            
+            if(!chkPwd( $.trim($('#pw').val()))){
+                alert('비밀번호를 확인하세요.(영문,숫자를 혼합하여 6~20자 이내)');
+                $('#pw').val('');
+                $('#pw2').val('');
+                $('#pw').focus();
+                return false;
+            }
+            
+            $.ajax({
+      				type : 'POST',
+      				url : '/signupProc/',
+      				data : {
+      					email : $('#email').val(),
+      					name : $('#name').val(),
+      					pw : $('#pw').val(),
+      					"csrfmiddlewaretoken": "{{ csrf_token }}",
+      				}
+      		    	}).done(function(responseText) {
+          			    if (responseText == "ok") {
+          			        alert("회원가입 성공");
+          			        var url = '/login';
+            			    location.href = url;
+          			    } else if(responseText == "email_exist") {
+          			    	alert("동일한 e-mail이 존재합니다");
+          			    } else {
+          			        alert("회원가입 실패");
+          			    }
+          			    
+      			    }).always(function() {
+      			
+      			    }).error(function(request, status, error) {
+      				    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      			    });
+        });
+    });
+</script>
+<div class="container">
+    <form class="form-horizontal" name="LoginForm" action="/login/" method="post" enctype="multipart/form-data">
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+            <input id="email" type="email" class="form-control" name="email" placeholder="이메일">
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+            <input id="name" type="text" class="form-control" name="name" placeholder="이름">
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+            <input id="pw" type="password" class="form-control" name="pw" placeholder="비밀번호 영문,숫자 혼합 6~20자">
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+            <input id="pw2" type="password" class="form-control" name="pw2" placeholder="비밀번호 확인">
+        </div>
+        <br>
+        <div class="control-group">
+            <div class="controls">
+                <button type="button" class="btn btn-warning btn-block" id="signup" name="signup">회원가입</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

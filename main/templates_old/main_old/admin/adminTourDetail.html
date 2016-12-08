@@ -1,0 +1,275 @@
+{% extends "main/base.html" %}
+{% block title %}
+{{tour.tourname}}
+{% endblock %}
+
+{% block content %}
+
+{% for match in matchcnt %}
+<script>var matchCnt = '{{match}}';</script>
+{% endfor %}
+
+<script>
+	var teamCount = '{{tour.teamcount}}';
+	var teamList = JSON.parse('{{teamlist|safe}}');
+	var tourteamlist = JSON.parse('{{tourteamlist|safe}}');
+	
+	function getTourArray(teamCnt) {
+		makeMatchRule(teamCnt);
+		var nowMatchList = g_matchRuleDB;
+		
+		var resultArray = [];
+		
+		for (var m = 0; m < teamCnt - 1; m++) {
+			var middle = [];
+			
+			middle['matchId'] = m+1;
+			middle['matchSeq'] = nowMatchList[m][2];
+	
+			if (nowMatchList[m][0] > 100) {
+				var tmp = nowMatchList[m][0] - 100;
+				middle['team_a'] = tmp + "번 경기 승리팀 ";
+			} else {
+				if(nowMatchList[m][2] == 2) {
+					middle['team_a'] = "team_bye";
+				} else {
+					middle['team_a'] = "team_a";
+				}
+			}
+	
+			if (nowMatchList[m][1] > 100) {
+				var tmp = nowMatchList[m][1] - 100;
+				middle['team_b'] = tmp + "번 경기 승리팀 ";
+			} else {
+				if(nowMatchList[m][2] == 2) {
+					middle['team_b'] = "team_bye";
+				} else {
+					middle['team_b'] = "team_b";
+				}
+			}
+			resultArray.push(middle);
+		}
+		return resultArray;
+	};
+	
+	function drawMatchList(matchArray, teamArray) {
+		var htmlTag = "";
+		// htmlTag += "<form enctype='multipart/form-data' method='POST' id='tourDetail'>";
+		// htmlTag += "{% csrf_token %}"
+		htmlTag += "<table class='myMatchTable' border='1px'>";
+		htmlTag += "<tr>";
+		htmlTag += "<th class='matchId'>No.</th>";
+		htmlTag += "<th colspan='3'>매치</th>";
+		htmlTag += "</tr>";
+		
+		for(var i=0; i<matchArray.length; i++) {
+			htmlTag += "<tr>";
+			htmlTag += "<td class='matchId'><span>" + matchArray[i]['matchId'] + "</span></td>";
+			htmlTag += "<td class='team_a'>";
+			
+			if (matchArray[i]['team_a'] == 'team_a' || matchArray[i]['team_a'] == 'team_bye') {
+				htmlTag += "<select id='" + matchArray[i]['matchId'] + "_team_a' data-theme='c'>";
+				htmlTag += "<option id='init' name='init' value='init'>---</option>";
+				
+				for(var j=0; j<teamArray.length; j++) {
+					htmlTag += "<option id='" + matchArray[i]['matchId'] + "_a_" + teamArray[j]['teamid'] + "' value='" + teamArray[j]['teamid'] + "'>" + teamArray[j]['teamname'] + "</option>";
+				}
+				htmlTag += "</select>";
+				
+				if(matchArray[i]['team_a'] == 'team_bye') {
+					htmlTag += "<b><font color='red'>1차전 부전승</font></b>";	
+				}
+			} else {
+				htmlTag += "<input type='hidden' value='empty' id='" + matchArray[i]['matchId'] + "_team_a'>" + matchArray[i]['team_a'] + "</input>";
+			}
+			
+			
+			htmlTag += "</td>";
+			htmlTag += "<td class='versus'>VS</td>";
+			htmlTag += "<td class='team_b'>";
+			
+			if (matchArray[i]['team_b'] == 'team_b' || matchArray[i]['team_b'] == 'team_bye') {
+				htmlTag += "<select id='" + matchArray[i]['matchId'] + "_team_b' data-theme='c'>";
+				htmlTag += "<option id='init' name='init' value='init'>---</option>";
+				
+				for(var j=0; j<teamArray.length; j++) {
+					htmlTag += "<option id='" + matchArray[i]['matchId'] + "_b_" + teamArray[j]['teamid'] + "' value='" + teamArray[j]['teamid'] + "'>" + teamArray[j]['teamname'] + "</option>";
+				}
+				htmlTag += "</select>";
+				if(matchArray[i]['team_b'] == 'team_bye') {
+					htmlTag += "<b><font color='red'>1차전 부전승</font></b>";	
+				}
+			} else {
+				htmlTag += "<input type='hidden' value='empty' id='" + matchArray[i]['matchId'] + "_team_b'>" + matchArray[i]['team_b'] + "</input>";
+			}
+			
+			htmlTag += "</td>";
+			htmlTag += "</tr>";
+		}
+		htmlTag += "</table>";
+		htmlTag += "<input type='button' id='setTourDetail' value='토너먼트저장'>";
+		// htmlTag += "</form>";
+		$("#matchGrid").html(htmlTag);
+		
+		for(var i=0; i<tourteamlist.length; i++) {
+			var id = tourteamlist[i]["matchid"] + "_" + tourteamlist[i]["teamside"] + "_" + tourteamlist[i]['teamid'];
+			console.log(id + '/' + tourteamlist[i]['teamid']);
+			$('#' + id).attr('selected','selected');
+		}
+	}
+	
+	function setTourDetail(gameId, tourId, tourArray) {
+		var tourList = [];
+		var tourTeamList = [];
+
+		for(var i=1; i<=tourArray.length; i++) {
+			var middle = new Object();
+			middle.gameId = gameId;
+			middle.tourId = tourId;
+			middle.matchId = i;
+			middle.matchSeq = tourArray[i-1]['matchSeq'];
+			middle.team_a = $('#' + i + '_team_a').val();
+			middle.team_b = $('#' + i + '_team_b').val();
+			
+			if (middle.team_a == "empty") {
+				middle.team_a = "";
+			}
+			
+			if (middle.team_b == "empty") {
+				middle.team_b = "";
+			}
+			
+			if (middle.team_a == 'init' || middle.team_b == 'init') {
+				alert('팀을 반드시 선택 해야합니다(' + i + '번 매치)');
+				return false;	
+			}
+			
+			if (middle.team_a == middle.team_b) {
+				if (middle.team_a != "") {
+					alert('한 매치에 같은 팀을 입력할 수 없습니다(' + i + '번 매치)');
+					return false;
+				}
+			}
+			
+			for(var j=0; j<tourList.length; j++) {
+				
+				if(middle.team_a != "") {
+					if(middle.team_a == tourList[j]['team_a']
+					|| middle.team_a == tourList[j]['team_b']) {
+						j += 1;
+						alert('팀을 중복 등록할 수 없습니다('+ i + '번매치,' + j + '번매치)');
+						return false;
+					}
+				}
+				
+				if(middle.team_b != "") {
+					if(middle.team_b == tourList[j]['team_a']
+					|| middle.team_b == tourList[j]['team_b']) {
+						j += 1;
+						alert('팀을 중복 등록할 수 없습니다('+ i + '번매치,' + j + '번매치)');
+						return false;
+					}
+				}
+			}
+			
+			if (middle.team_a != "") {
+				var middleTeam = new Object();
+				middleTeam.gameId = gameId;
+				middleTeam.tourId = tourId;
+				middleTeam.teamId = middle['team_a'];
+				middleTeam.matchId = middle['matchId'];
+				middleTeam.matchSeq = middle['matchSeq'];
+				middleTeam.teamSide = 'a';
+				tourTeamList.push(middleTeam);
+			}
+			
+			if (middle.team_b != "") {
+				var middleTeam = new Object();
+				middleTeam.gameId = gameId;
+				middleTeam.tourId = tourId;
+				middleTeam.teamId = middle['team_b'];
+				middleTeam.matchId = middle['matchId'];
+				middleTeam.matchSeq = middle['matchSeq'];
+				middleTeam.teamSide = 'b';
+				tourTeamList.push(middleTeam);
+			}
+			
+			tourList.push(middle);
+			
+		}
+		
+		var tourListString = JSON.stringify(tourList);
+		var tourTeamListString = JSON.stringify(tourTeamList);
+		
+		$.ajax({
+			type : 'POST',
+      		url : '/adminTourDetailProc/',
+      		data : {
+      			gameId : gameId,
+      			tourId : tourId,
+      			tourList : tourListString,
+      			tourTeamList : tourTeamListString,
+      			"csrfmiddlewaretoken": '{{ csrf_token }}',
+      		}
+      		}).done(function(responseText) {
+          	    if (responseText) {
+          	        alert('팀 등록을 완료 하였습니다');
+          	        var url = '/adminTour/' + gameId;
+            	    location.href = url;
+          	    }
+          	    
+      		}).always(function() {
+      		
+      		}).error(function(request, status, error) {
+      		    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      		});
+	}
+	
+	$(function() {
+		$(document).on('click',"#setTourDetail",function () {
+			console.log('clicked');
+			var gameId = '{{game.gameid}}';
+			var tourId = '{{tour.tourid}}';
+			setTourDetail(gameId, tourId,tourArray);
+		});
+	});
+</script>
+<style>
+    .myMatchList .myMatchTable{width: 100%; text-align:center; border-collapse: collapse; border:1px solid #d0d0d0; font-size:12px}
+	.myMatchList .myMatchTable tr th{background-color: #86BCCB; padding: 10px; color:#FFFFFF}
+	.myMatchList .myMatchTable tr td{padding: 0px; height : 70px;}
+	.myMatchList .myMatchTable tr td.matchId{width:5px}
+	.myMatchList .myMatchTable tr td.team_a{border-left:0px; border-right:0px; padding-left:5px; text-align:center;}
+	.myMatchList .myMatchTable tr td.team_b{border-left:0px; padding-left:0px; padding-right:5px; text-align:center;}
+	.myMatchList .myMatchTable tr td.score{padding-left:0px; padding-right:0px; border-left:0px; border-right:0px; margin:auto; width:50px;}
+	.myMatchList .myMatchTable tr td.versus{border-left:0; border-right:0; font-size:13px; font-weight:bold; color:#CC0000; padding:0px}
+</style>
+
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+      <ul>
+        <li><a href='/adminGame/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">기본정보</span></a></li>
+			  <li><a href='/adminTour/{{game.gameid}}/' class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href='/adminTourResult/{{game.gameid}}/init/' rel="external", data-ajax="false"><span id="navText">결과입력</span></a></li>
+		    <li><a href='/adminGameTeam/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">선수관리</span></a></li>
+  		</ul>
+  	</div>				
+</div>
+
+<div data-role="main" class="ui-content">
+	<div class="myMatchList" align="center">
+		<h2><b>{{tour.tourname}}</b></h2>
+		<div id="matchGrid"></div>
+		<script>
+			var tourArray = getTourArray(teamCount);
+			drawMatchList(tourArray, teamList);
+		</script>
+		<form action = "/adminTourInfo/{{game.gameid}}/{{tour.tourid}}/" method="post">
+        	{% csrf_token %}
+        	<button class="btn btn-warning btn-block" name="adminTourInfo">기본정보수정</button>
+        </form>
+    </form>
+	</div>
+</div>
+
+{% endblock %}

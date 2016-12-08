@@ -1,0 +1,19 @@
+<html>
+    <head>
+    </head>
+    <body>
+        {% if user.is_authenticated %}
+    	<script>
+            alert('{{name}}님 환영합니다');
+            var url = '/';
+            location.href = url;
+        </script>
+		{% else %}
+		<script>
+            alert('아이디 및 비밀번호를 확인 해 주세요');
+            var url = '/login/';
+            location.href = url;
+        </script>
+		{% endif %}
+    </body>
+</html>

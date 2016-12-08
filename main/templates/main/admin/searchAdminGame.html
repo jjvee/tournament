@@ -1,0 +1,37 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+    <div><h2>대회관리</h2></div>
+    <form action = "/createGame/" method="post">
+        {% csrf_token %}
+        <button class="btn btn-warning btn-block" name="createGame" data-theme="e">신규대회생성</button>
+    </form>
+    <br>
+    <table id="orderTable" class="table table-striped">
+        <thead>
+        <tr>
+            <th><B>대회명</B></th>
+            <th><B>지역</B></th>
+            <th><B>개최일</B></th>
+        </tr>
+        </thead>
+        
+        <tbody>
+        {% for game in games %}
+        <tr>
+            <td><a href="/adminGame/{{game.gameid}}/">{{game.gamename}}</a></td>
+            <td>{{game.region}}</td>
+            <td>{{game.begindate}}</td>
+        </tr>
+        {% endfor %}
+        
+        <tbody>
+    </table>
+</div>
+{% endblock %}

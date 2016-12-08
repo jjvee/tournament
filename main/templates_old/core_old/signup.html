@@ -1,0 +1,120 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Mintonz Login{% endblock %}
+
+{% block content %}
+<script>
+    function validateEmail(elementValue){         
+       var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;   
+       return emailPattern.test(elementValue);    
+    }
+    
+    function chkPwd(str){
+        var reg_pwd = /^.*(?=.{6,20})(?=.*[0-9])(?=.*[a-zA-Z]).*$/;
+        if(!reg_pwd.test(str)){
+            return false;
+        }
+        return true;
+    }
+    
+	$(function() {
+        $('#signup').click(function(event) {
+            event.preventDefault();
+            
+            if( $('#email').val() == ""){
+                alert("E-Mail은 필수입니다");
+                return false;
+            }
+            
+            if( $('#name').val() == ""){
+                alert("이름은 필수입니다");
+                return false;
+            }
+            
+            if( $('#pw').val() == "" || $('#pw2').val() == ""){
+                alert("비밀번호는 필수입니다");
+                return false;
+            }
+            
+            if( $('#pw').val() != $('#pw2').val()) {
+                alert('비밀번호가 일치하지 않습니다');
+                return false;
+            }
+            
+            // checkEmail = ;
+            
+            if( validateEmail($('#email').val()) == false ) {
+                alert('올바른 이메일 형식이 아닙니다');
+                return false;
+            }
+            
+            if(!chkPwd( $.trim($('#pw').val()))){
+                alert('비밀번호를 확인하세요.(영문,숫자를 혼합하여 6~20자 이내)');
+                $('#pw').val('');
+                $('#pw2').val('');
+                $('#pw').focus();
+                return false;
+            }
+            
+            $.ajax({
+      				type : 'POST',
+      				url : '/signupProc/',
+      				data : {
+      					email : $('#email').val(),
+      					name : $('#name').val(),
+      					pw : $('#pw').val(),
+      					"csrfmiddlewaretoken": "{{ csrf_token }}",
+      				}
+      		    	}).done(function(responseText) {
+          			    if (responseText == "ok") {
+          			        alert("회원가입 성공");
+          			        var url = '/login';
+            			    location.href = url;
+          			    } else if(responseText == "email_exist") {
+          			    	alert("동일한 e-mail이 존재합니다");
+          			    } else {
+          			        alert("회원가입 실패");
+          			    }
+          			    
+      			    }).always(function() {
+      			
+      			    }).error(function(request, status, error) {
+      				    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      			    });
+        });
+    });
+</script>
+<div data-role="main" class="ui-content">
+    <div id="login">
+        <div class="control-group">
+            <label class="control-label" for="email">이메일</label>
+            <div class="controls">
+                <input type="email" name="email" id="email" placeholder="E-Mail">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="name">이름</label>
+            <div class="controls">
+                <input type="text" id="name" name="name"  placeholder="Name">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="pw">패스워드</label>
+            <div class="controls">
+                <input type="password" name="pw" id="pw" placeholder="영문,숫자를 혼합하여 6~20자 이내">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="pw2">패스워드확인</label>
+            <div class="controls">
+                <input type="password" name="pw2" id="pw2" placeholder="영문,숫자를 혼합하여 6~20자 이내">
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button type="button" name="signup" id="signup" class="btn" data-toggle="modal">회원가입</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

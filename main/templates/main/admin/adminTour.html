@@ -1,0 +1,31 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <ol class="breadcrumb">
+        <li><a href='/adminGame/{{game.gameid}}/'>기본정보</a></li>
+        <li class="active"><a href='/adminTour/{{game.gameid}}/'><b>토너먼트</b></a></li>
+        <li><a href='/adminTourResult/{{game.gameid}}/init/'>결과입력</a></li>
+        <li><a href='/adminGameTeam/{{game.gameid}}/'>선수관리</a></li>
+    </ol>
+    <div><h2>토너먼트</h2></div>
+    <br>
+    <form action = "/createTour/{{game.gameid}}/" method="post">
+        {% csrf_token %}
+        <button class="btn btn-warning btn-block" name="createTour" data-theme="e">토너먼트 생성</button>
+    </form>
+    <br>
+    <div class="list-group">
+      {% for tour in tours %}
+      <a href="/adminTourDetail/{{game.gameid}}/{{tour.tourid}}/" class="list-group-item">
+        <p class="list-group-item-heading"><b>{{tour.tourname}}</b></p>
+        <p class="list-group-item-text"><i>{{tour.teamcount}}팀 참가</i></p>
+      </a>
+      {% endfor %}
+    </div>
+</div>
+{% endblock %}

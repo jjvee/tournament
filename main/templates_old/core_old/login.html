@@ -1,0 +1,37 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Mintonz Login{% endblock %}
+
+{% block content %}
+<div data-role="main" class="ui-content">
+    <div id="login">
+        {% if check == 'false' %}
+        <p align="center"><font color="red">아이디와 비밀번호를 확인하세요</font></p>
+        {% elif check == 'not_active' %}
+        <p align="center"><font color="red">휴면처리 되어진 계정입니다</font></p>
+        {% endif %}
+        <form class="form-horizontal" name="LoginForm" action="/login/" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}" />
+        <div class="control-group">
+            <label class="control-label" for="username">이메일</label>
+            <div class="controls">
+                <input type="email" id="username" name="username"  placeholder="이메일">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="password">패스워드</label>
+            <div class="controls">
+                <input type="password" name="password" id="password" placeholder="패스워드">
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn" data-toggle="modal">로그인</button>
+            </div>
+        </div>
+        </form>
+        <button class="btn btn-primary btn-block" id="signup" name="signup" data-theme="e" onclick="location.href='/signup/'">회원가입</button>
+    </div>
+</div>
+{% endblock %}

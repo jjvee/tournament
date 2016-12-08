@@ -1,0 +1,48 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if boardtype == 'game' %}
+    <ol class="breadcrumb">
+            <li><a href="/gameMain/{{game.gameid}}/">대회메인</a></li>
+            <li><a href="/tourMain/{{game.gameid}}/">토너먼트</a></li>
+            <li class="active"><a href="/boardList/game/{{game.gameid}}/"><b>게시판</b></a></li>
+        </ol>
+    {% endif %}
+    
+    <div><h2>{{boardtypetext}}</h2></div>
+    {% if boardtype == 'notice' %}
+		{% if request.user.is_staff == True %}
+		<button type="button" name="boardwrite" value="새글작성" class="btn btn-primary btn-block" onclick="location.href='/boardWrite/{{boardtype}}/{{gameid}}'">새글작성</button>
+		{% endif %}
+	{% else %}
+	<button type="button" name="boardwrite" value="새글작성" class="btn btn-primary btn-block" onclick="location.href='/boardWrite/{{boardtype}}/{{gameid}}'">새글작성</button>
+	{% endif %}
+    <br>
+    <table id="orderTable" class="table table-striped">
+        <thead>
+        <tr>
+            <th><b>제목</b></th>
+            <th><b>작성자</b></th>
+            <th><b>작성일</b></th>
+            <th><b>조회수</b></th>
+        </tr>
+        </thead>
+        
+        <tbody>
+        {% for board in boardlist %}
+        <tr>
+            <td><a href="/boardView/{{boardtype}}/{{gameid}}/{{board.id}}">{{board.title}}</a></td>
+            <td>{{board.insertuser.first_name}}</td>
+            <td>{{board.insertdate}}</td>
+            <td>{{board.hits}}</td>
+        </tr>
+        {% endfor %}
+        
+        <tbody>
+    </table>
+</div>
+{% endblock %}

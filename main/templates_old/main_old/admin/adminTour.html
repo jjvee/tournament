@@ -1,0 +1,44 @@
+
+{% extends "main/base.html" %}
+{% block title %}
+대회메인
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+
+<style>
+	#navText{font-size: 12px;}
+</style>
+
+<script>
+    console.log('{{ csrf_token }}');
+</script>
+
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+      <ul>
+        <li><a href='/adminGame/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">기본정보</span></a></li>
+			  <li><a href='/adminTour/{{game.gameid}}/' class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href='/adminTourResult/{{game.gameid}}/init/' rel="external", data-ajax="false"><span id="navText">결과입력</span></a></li>
+		    <li><a href='/adminGameTeam/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">선수관리</span></a></li>
+  		</ul>
+  	</div>				
+</div>
+
+<div data-role="main" class="ui-content">
+    <form action = "/createTour/{{game.gameid}}/" method="post">
+        {% csrf_token %}
+        <button class="btn btn-warning btn-block" name="createTour" data-theme="e">토너먼트 생성</button>
+    </form>
+    <ul id="tourList" data-role="listview" data-inset="true" data-theme="c">
+		{% for tour in tours %}
+			<li><a href="/adminTourDetail/{{game.gameid}}/{{tour.tourid}}/" rel="external">
+				<h1>{{tour.tourname}}</h1>
+			</a></li>
+		{% endfor %}
+	</ul>
+</div>
+
+{% endblock %}

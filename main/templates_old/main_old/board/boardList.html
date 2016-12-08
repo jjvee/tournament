@@ -1,0 +1,45 @@
+
+{% extends "main/base.html" %}
+{% block title %}
+Board
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+{% if boardtype == 'game' %}
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+        <ul>
+            <li><a href='/gameMain/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">대회메인</span></a></li>
+			<li><a href='/tourMain/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href="/boardList/game/{{game.gameid}}/" class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">게시판</span></a></li>
+		</ul>
+	</div>
+</div>
+{% endif %}
+<div data-role="main" class="ui-content">
+	<div><h2>{{boardtypetext}}</h2></div>
+	<!--<form action="/boardList/" method="POST">-->
+	<!--	{% csrf_token %}-->
+	<!--	<input type="search" name="gameName" placeholder="검색"/>-->
+	<!--	<input type="submit" value="검색" data-theme="b"/>-->
+	<!--</form>-->
+	{% if boardtype == 'notice' %}
+		{% if request.user.is_staff == True %}
+		<input type="button" name="boardwrite" value="새글작성" onclick="location.href='/boardWrite/{{boardtype}}/{{gameid}}'"/>
+		{% endif %}
+	{% else %}
+	<input type="button" name="boardwrite" value="새글작성" onclick="location.href='/boardWrite/{{boardtype}}/{{gameid}}'"/>
+	{% endif %}
+	<ul id="BoardList" data-role="listview" data-inset="true" data-theme="c">
+		{% for board in boardlist %}
+			<li><a href="/boardView/{{boardtype}}/{{gameid}}/{{board.id}}" rel="external">
+				<h1>{{board.title}}</h1>
+				<p>작성자 : {{board.insertuser.first_name}} / {{board.insertdate}}</p>
+				<p>조회수 : {{board.hits}}</p>
+			</a></li>
+		{% endfor %}
+	</ul>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+
+{% extends "main/base.html" %}
+{% block title %}
+Board
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<script>
+	$(function() {
+        $('#createNewArticle').click(function(event) {
+            event.preventDefault();
+            
+            if (confirm("작성 완료 하시겠습니까?") == false) {
+                return false;
+            }
+            
+            var title = $('#title').val();
+            var cont = $('#cont').val();
+            var boardType = "{{boardtype}}";
+            var gameId    = "{{gameid}}";
+            
+            if (title == '') {
+                alert('제목은 필수입니다');
+                return false;
+            };
+            
+            $.ajax({
+      				type : 'POST',
+      				url : '/boardWriteProc/',
+      				data : {
+      					title : title,
+      					cont : cont,
+      					boardType : boardType,
+      					gameId : gameId,
+      					"csrfmiddlewaretoken": "{{ csrf_token }}",
+      				}
+      		    	}).done(function(responseText) {
+          			    if (responseText) {
+          			        var url = '/boardList/' + boardType + '/' + gameId + '/';
+            			      location.href = url;
+          			    }
+          			    
+      			    }).always(function() {
+      			
+      			    }).error(function(request, status, error) {
+      				    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      			    });
+        });
+    });
+</script>
+{% if boardtype == 'game' %}
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+        <ul>
+            <li><a href='/gameMain/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">대회메인</span></a></li>
+			<li><a href='/tourMain/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href="/boardList/game/{{game.gameid}}/" class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">게시판</span></a></li>
+		</ul>
+	</div>
+</div>
+{% endif %}
+<div data-role="main" class="ui-content">
+	<div><h2>{{boardtypetext}}</h2></div>
+
+    <div class="form-group">
+      <label for="insertuser">작성자</label>
+      <input type="text" class="form-control" id="insertuser" name="insertuser" value="{{user.first_name}}" readonly>
+    </div>
+    <div class="form-group">
+      <label for="title">제목</label>
+      <input type="text" class="form-control" id="title" name="title">
+    </div>
+    <div class="form-group">
+      <label for="cont">내용</label>
+      <textarea rows="15" cols="40" id="cont" name="cont"></textarea>
+    </div>
+    <button class="btn btn-primary btn-block" id="createNewArticle" name="createNewArticle">작성</button>
+
+</div>
+
+{% endblock %}

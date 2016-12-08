@@ -1,0 +1,81 @@
+{% extends "main/base.html" %}
+{% block title %}
+대회생성
+{% endblock %}
+
+{% block content %}
+<script>
+    $(function() {
+        $('#gamename').val('{{game.gamename}}');
+        $('#createNewTour').click(function(event) {
+            event.preventDefault();
+            
+            var gameid = '{{game.gameid}}';
+            var tourname = $('#tourname').val();
+            var teamcount = $('#teamcount').val();
+            
+            if (tourname == '') {
+                alert('토너먼트명은 필수입니다');
+                return false;
+            };
+            
+            if (teamcount == '') {
+                alert('참가팀 수는 필수입니다');
+                return false;
+            } else if(teamcount == '1') {
+                alert('참가팀 수가 1명인 경우는 등록할 수 없습니다');
+                return false;
+            };
+            
+            $.ajax({
+      				type : 'POST',
+      				url : '/createNewTour/',
+      				data : {
+      				  gameid : gameid,
+      					tourname : tourname,
+      					teamcount : teamcount,
+      					"csrfmiddlewaretoken": "{{ csrf_token }}",
+      				}
+      		    	}).done(function(responseText) {
+          			    if (responseText) {
+          			      alert('토너먼트 생성에 성공하였습니다. 토너먼트 관리 페이지로 이동합니다')
+          			        var url = '/adminTourDetail/' + '{{game.gameid}}' + '/' + responseText + '/';
+            			      location.href = url;
+          			    }
+          			    
+      			    }).always(function() {
+      			
+      			    }).error(function(request, status, error) {
+      				    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      			    });
+              })
+    });
+</script>
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+      <ul>
+        <li><a href='/adminGame/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">기본정보</span></a></li>
+			  <li><a href='/adminTour/{{game.gameid}}/' class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href='/adminTourResult/{{game.gameid}}/init/' rel="external", data-ajax="false"><span id="navText">결과입력</span></a></li>
+		    <li><a href='/adminGameTeam/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">선수관리</span></a></li>
+  		</ul>
+  	</div>				
+</div>
+
+<div data-role="main" class="ui-content">
+  <h2><b>{{game.gamename}}</b></h2>
+    <form action = "/createNewTour/" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="tourname">토너먼트명</label>
+          <input type="text" class="form-control" id="tourname" name="tourname">
+        </div>
+        <div class="form-group">
+          <label for="teamcount">참가팀수</label>
+          <input type="number" class="form-control" id="teamcount" name="teamcount">
+        </div>
+        <button class="btn btn-primary btn-block" id="createNewTour" name="createNewTour">생성</button>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,103 @@
+
+{% extends "main/base.html" %}
+{% block title %}
+대회메인
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+
+<style>
+	#navText{font-size: 12px;}
+	.teamlist{width: 100%; text-align:center; border-collapse: collapse; border:1px solid #d0d0d0; font-size:12px}
+	.teamlist tr th{background-color: #86BCCB; padding: 10px; color:#FFFFFF}
+	.teamlist tr td{padding: 5px;}
+</style>
+
+<script>
+    $(function() {
+    	$('#addButton').click(function(event) {
+			addTeamList();
+		});
+		
+		$('#confirmButton').click(function(event) {
+			
+			var teamArray = [];
+			$("table#teamlist tr").each(function() {
+			    var middleArr = new Object();
+			    var tableData = $(this).find('td#teamname');
+			    if (tableData.length > 0) {
+			        tableData.each(function() {	middleArr['teamname'] = $(this).text(); });
+			        teamArray.push(middleArr);
+			    }
+			});
+			
+			var gameId = '{{game.gameid}}';
+			var teamListString = JSON.stringify(teamArray);
+			
+			$.ajax({
+			type : 'POST',
+      		url : '/addTeamProc/',
+      		data : {
+      			gameId : gameId,
+      			teamList : teamListString,
+      			"csrfmiddlewaretoken": '{{ csrf_token }}',
+      		}
+      		}).done(function(responseText) {
+          	    if (responseText) {
+          	        alert("참가팀 등록을 완료 하였습니다");
+          	        var url = '/adminGameTeam/' + gameId;
+            	    location.href = url;
+          	    }
+          	    
+      		}).always(function() {
+      		
+      		}).error(function(request, status, error) {
+      		    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      		});
+		});
+	});
+	
+	function addTeamList(){
+		var teamname = $("#teamname").val();
+		if (teamname) {
+			$("#teamlist").append("<tr><td id='teamname'>" + teamname + "</td><td onclick='deleteRow(this)'><a href='#'>삭제</a></td></tr>");
+			$("#teamname").val("");
+		}
+	}
+	
+	function deleteRow(obj) {
+		rowIndex = $(obj).closest('tr').index();
+		document.getElementById("teamlist").deleteRow(rowIndex);
+	}
+</script>
+
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+      <ul>
+        <li><a href='/adminGame/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">기본정보</span></a></li>
+			  <li><a href='/adminTour/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href='/adminTourResult/{{game.gameid}}/init/' rel="external", data-ajax="false"><span id="navText">결과입력</span></a></li>
+		    <li><a href='/adminGameTeam/{{game.gameid}}/' class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">선수관리</span></a></li>
+  		</ul>
+  	</div>				
+</div>
+
+<div data-role="main" class="ui-content">
+    <label for="teamname">팀/선수명</label>
+    <input type="text" class="form-control" id="teamname" name="teamname" onkeypress="if(event.keyCode==13) {addTeamList();}">
+    <input type="button" class="form-control" id="addButton" name="addButton" value="추가">
+    <input type="button" class="form-control" data-theme="e" id="confirmButton" name="confirmButton" value="확정">
+    
+    <br>
+	<table id="teamlist" class="teamlist">
+	    <tr>
+	        <th>팀명</th>
+	        <th>삭제</th>
+	    </tr>
+	</table>
+
+</div>
+
+{% endblock %}

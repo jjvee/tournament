@@ -1,0 +1,37 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+    <ol class="breadcrumb">
+        <li><a href='/adminGame/{{game.gameid}}/'>기본정보</a></li>
+        <li><a href='/adminTour/{{game.gameid}}/'>토너먼트</a></li>
+        <li><a href='/adminTourResult/{{game.gameid}}/init/'>결과입력</a></li>
+        <li class="active"><a href='/adminGameTeam/{{game.gameid}}/'><b>선수관리</b></a></li>
+    </ol>
+    <h2><b>참가팀 관리</b></h2>
+    <br>
+    <button type="button" name="addTeam" class="btn btn-primary btn-block" onclick="location.href='/addTeam/{{game.gameid}}/'">참가팀추가</button>
+    <button type="button" name="addTeam" class="btn btn-warning btn-block" onclick="location.href='/deleteTeam/{{game.gameid}}/'">참가팀삭제</button>
+	<br>
+	<table id="teamList" class="table table-striped">
+        <thead>
+        <tr>
+            <th><b>참가팀</b></th>
+        </tr>
+        </thead>
+        
+        <tbody>
+        {% for team in teams %}
+        <tr>
+            <td>{{team.teamname}}</td>
+        </tr>
+        {% endfor %}
+        <tbody>
+    </table>
+</div>
+{% endblock %}

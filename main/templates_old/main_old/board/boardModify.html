@@ -1,0 +1,93 @@
+
+{% extends "main/base.html" %}
+{% block title %}
+Board
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<script>
+	$(function() {
+        $('#modifyArticle').click(function(event) {
+            event.preventDefault();
+            
+            if (confirm("작성 완료 하시겠습니까?") == false) {
+                return false;
+            }
+            
+            var title = $('#title').val();
+            var cont = $('#cont').val();
+            var boardType = "{{boardtype}}";
+            var gameId    = "{{gameid}}";
+            var boardId   = "{{board.id}}";
+            
+            if (title == '') {
+                alert('제목은 필수입니다');
+                return false;
+            };
+            
+            $.ajax({
+      				type : 'POST',
+      				url : '/boardModifyProc/',
+      				data : {
+      					title : title,
+      					cont : cont,
+      					boardType : boardType,
+      					gameId : gameId,
+      					boardId : boardId,
+      					"csrfmiddlewaretoken": "{{ csrf_token }}",
+      				}
+      		    	}).done(function(responseText) {
+      		    	    if (responseText == "ok") {
+          			        var url = '/boardList/' + boardType + '/' + gameId + '/';
+            			    location.href = url;
+          			    } else {
+          			    	alert("작성자 본인의 글만 수정 할 수 있습니다");
+          			    }
+      			    }).always(function() {
+      			
+      			    }).error(function(request, status, error) {
+      				    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      			    });
+        });
+    });
+</script>
+{% if boardtype == 'game' %}
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+        <ul>
+            <li><a href='/gameMain/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">대회메인</span></a></li>
+			<li><a href='/tourMain/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href="/boardList/game/{{game.gameid}}/" class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">게시판</span></a></li>
+		</ul>
+	</div>
+</div>
+{% endif %}
+
+{% if owner == False %}
+<script>
+    alert("잘못된 접근입니다");
+    location.href = '/';
+</script>
+{% endif %}
+<div data-role="main" class="ui-content">
+	<div><h2>{{boardtypetext}}</h2></div>
+
+    <div class="form-group">
+      <label for="insertuser">작성자</label>
+      <input type="text" class="form-control" id="insertuser" name="insertuser" value="{{board.insertuser.first_name}}" readonly>
+    </div>
+    <div class="form-group">
+      <label for="title">제목</label>
+      <input type="text" class="form-control" id="title" name="title" value="{{board.title}}">
+    </div>
+    <div class="form-group">
+      <label for="cont">내용</label>
+      <textarea rows="15" cols="40" id="cont" name="cont">{{board.cont}}</textarea>
+    </div>
+    <button class="btn btn-primary btn-block" id="modifyArticle" name="modifyArticle">수정</button>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+{% block content %}
+{% load static %}
+<style>
+	#mainLogoArea{width: inherit; margin: 0 auto; text-align: center; padding: 5px}
+	#mainLogoArea img{max-width: 250px; height: auto;}
+</style>
+<div class="container">
+    
+    <br>
+    <br>
+    <br>
+    <table id="mainLogoArea">
+    	<tr>
+    		<td>
+    			<img src="{% static "img/logo/mintonz_logo_black.png" %}">
+    		</td>
+    	</tr>
+    </table>
+    <br>
+    <br>
+	<br>
+	
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#collapse1">대회</a>
+                </h4>
+            </div>
+            <div id="collapse1" class="panel-collapse collapse">
+                <div class="list-group">
+                    <a href="/searchGame" class="list-group-item list-group-item-action">대회검색</a>
+                    <a href="/searchAdminGame" class="list-group-item list-group-item-action">대회관리</a>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#collapse2">커뮤니티</a>
+                </h4>
+            </div>
+            <div id="collapse2" class="panel-collapse collapse">
+                <div class="list-group">
+                    <a href="/boardList/notice/all" class="list-group-item list-group-item-action">공지사항</a>
+                    <a href="/boardList/free/all" class="list-group-item list-group-item-action">자유게시판</a>
+                    <a href="/boardList/qna/all" class="list-group-item list-group-item-action">Q&A</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

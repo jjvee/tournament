@@ -1,0 +1,84 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+
+{% block content %}
+<script>
+	$(function() {
+        $('#deleteArticle').click(function(event) {
+            event.preventDefault();
+            
+            if (confirm("작성글을 삭제 하시겠습니까?") == false) {
+                return false;
+            }
+            
+            var boardType = "{{boardtype}}";
+            var boardId = "{{board.id}}";
+            var gameId = "{{gameid}}";
+            
+            $.ajax({
+      				type : 'POST',
+      				url : '/boardDeleteProc/',
+      				data : {
+      					boardType : boardType,
+      					boardId : boardId,
+      					gameid : gameId,
+      					"csrfmiddlewaretoken": "{{ csrf_token }}",
+      				}
+      		    	}).done(function(responseText) {
+          			    if (responseText == "ok") {
+          			        var url = '/boardList/' + boardType + '/' + gameId + '/';
+            			    location.href = url;
+          			    } else {
+          			    	alert("작성자 본인의 글만 삭제 할 수 있습니다");
+          			    }
+          			    
+      			    }).always(function() {
+      			
+      			    }).error(function(request, status, error) {
+      				    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      			    });
+        });
+    });
+</script>
+<div class="container">
+  {% if boardtype == 'game' %}
+  <ol class="breadcrumb">
+    <li><a href="/gameMain/{{game.gameid}}/">대회메인</a></li>
+    <li><a href="/tourMain/{{game.gameid}}/">토너먼트</a></li>
+    <li class="active"><a href="/boardList/game/{{game.gameid}}/"><b>게시판</b></a></li>
+  </ol>
+  {% endif %}
+  <div><h2>{{boardtypetext}}</h2></div>
+    <br>
+    
+    <div class="form-group">
+      <label for="insertuser">작성자</label>
+      <input class="form-control" id="insertuser" type="text" value="{{board.insertuser.first_name}}" disabled>
+    </div>
+    
+    <div class="form-group">
+      <label for="insertdate">작성일</label>
+        <input class="form-control" id="insertdate" type="text" value="{{board.insertdate}}" disabled>
+    </div>
+    
+    <div class="form-group">
+      <label for="title">제목</label>
+        <input class="form-control" id="title" type="text" value="{{board.title}}" readonly>
+    </div>
+    
+    <div class="form-group">
+      <label for="cont">내용</label>
+      <textarea class="form-control" rows="10" id="cont" readonly>{{board.cont}}</textarea>
+    </div>
+
+  {% if owner == True %}
+	<button class="btn btn-primary btn-block" id="modifyArticle" name="modifyArticle" onclick="location.href='/boardModify/{{boardtype}}/{{gameid}}/{{board.id}}'">수정</button>
+	<button class="btn btn-warning btn-block" id="deleteArticle" name="deleteArticle" data-theme="d">삭제</button>
+	{% endif %}
+  <br>
+    
+</div>
+{% endblock %}

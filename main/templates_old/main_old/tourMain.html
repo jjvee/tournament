@@ -1,0 +1,165 @@
+{% extends "main/base.html" %}
+{% block title %}
+토너먼트
+{% endblock %}
+
+{% block content %}
+
+<style>
+	#GameGeneralInfo { border-collapse: collapse; background-color: #FFFFFF }
+	#GameGeneralInfo tr th{text-align: center; background-color: #BDBDBD; padding: 5px}
+	#GameGeneralInfo tr td{padding: 5px}
+	#GamePoster{width: inherit; margin: 0 auto; text-align: center; padding: 5px; background-color: #FFFFFF}
+	#GamePoster img{max-width: 200px; height: auto;}
+	#navText{font-size: 12px;}
+	#tourList{z-index: 1;}
+</style>
+
+<style>			
+	.myMatchList .myMatchTable{width: 100%; text-align:center; border-collapse: collapse; border:1px solid #d0d0d0; font-size:12px}
+	.myMatchList .myMatchTable tr th{background-color: #86BCCB; padding: 10px; color:#FFFFFF}
+	.myMatchList .myMatchTable tr td{padding: 5px;}
+	.myMatchList .myMatchTable tr td.matchId{width:5px}
+	.myMatchList .myMatchTable tr td.playerNameA{border-left:0px; border-right:0px; padding-left:0px; text-align:center}
+	.myMatchList .myMatchTable tr td.playerNameB{border-left:0px; padding-left:0px; padding-right:0px; text-align:center;}
+	.myMatchList .myMatchTable tr td.score{padding-left:0px; padding-right:0px; border-left:0px; border-right:0px; margin:auto; width:50px;}
+	.myMatchList .myMatchTable tr td.versus{border-left:0; border-right:0; font-size:13px; font-weight:bold; color:#CC0000; padding:0px}
+	
+	.winner {color:red; font-weight:bold}
+	.player {}
+	input#score {display: block; margin: auto; font-family: sans-serif; font-weight: bold; font-size:110%; outline: 0; border: 1px solid #444; background: #f4f4f4; color: black; border-radius: 1px; text-align: center; box-shadow: 0 2px 8px #bbb, inset 0 0 0 1px white;}
+	input#score:focus {background: white;}
+</style>
+
+<script>
+	var tourid = '{{tourdetail.tourid}}';
+	var matches = '{{matches}}';
+
+	function onChange(value) {
+		var gameid = '{{game.gameid}}';
+		var tourid = value;
+		
+		$('#tourid').val(tourid);
+
+		if (tourid != 'init') {
+			$('#tourDetail').submit()
+		}
+	}
+	
+	function bigImage(fileName,winName,width,height){
+		var scrollYes="";
+		(width > 1024) ? scrollYes="yes" : scrollYes="no";
+		var winpage=window.open("",winName,"toolbar=no,scrollbars="+scrollYes+",resizable=no,width=" + width + ",height=" + height); 
+		
+		if(winpage != null){ 
+			var htmlcontent = "<html>"//+"<style> .body{background-repeat: no-repeat;} </style>"
+			+"<head><title>토너먼트</title>"
+			+ "</head><body style='background-repeat: no-repeat;' topmargin=0 leftmargin=0 background= "+ fileName + ">"
+			+ "<a onclick='self.close();'><div style='WIDTH:"+width+";HEIGHT:"+ height +";CURSOR:HAND;' title='클릭하면 창이 닫힙니다.'>"
+			+ "<div style='WIDTH:"+width+";BORDER:0px SOLID #FFFFFF;'>&nbsp;</div></div></a>"
+			+ "</body></html>";
+			winpage.document.open();
+			winpage.document.write(htmlcontent);
+			winpage.document.close();
+		}
+		
+		if(winpage != null) 
+		winpage.focus();
+		return winpage;
+	}	
+	
+	function toDataURL(){
+		var asd = document.getElementById("myCanvas");
+		bigImage(asd.toDataURL(),"새창",900,700);
+	}
+</script>
+
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+        <ul>
+            <li><a href='/gameMain/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">대회메인</span></a></li>
+			<li><a href='/tourMain/{{game.gameid}}/' class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href="/boardList/game/{{game.gameid}}/" rel="external", data-ajax="false"><span id="navText">게시판</span></a></li>
+		</ul>
+	</div>
+</div>
+
+<div data-role="main" class="ui-content" align="center">
+	<div><h2>토너먼트 목록</h2></div>
+	<select name="tourList" id="tourList" onchange="onChange(this.value)" data-native-menu="true" data-theme="f">
+		<option value='init'><p>토너먼트를 선택하세요</p></option>
+		{% for tour in tours %}
+		
+		{% if tour.tourid == tourdetail.tourid %}
+		<option selected="selected" value={{tour.tourid}}><p>{{tour.tourname}}</p></option>
+		{% else %}
+		<option value={{tour.tourid}}><p>{{tour.tourname}}</p></option>
+		{% endif %}
+		
+		{% endfor %}
+	</select>
+	
+	<form action="/tourMain/{{game.gameid}}/" method="post" id="tourDetail" rel>
+        {% csrf_token %}
+        <input type="hidden" class="form-control" id="tourid" name="tourid">
+    </form>
+    
+    {% if matches %}
+	<button onclick="toDataURL();">크게보기</button>
+	{% if tourdetail.teamcount < 17 %}
+	<canvas id="myCanvasvisible" width="325" height="160" style="border: 1px solid black;">
+	<canvas id="myCanvas" width="900" height="400" style=" border: 1px solid black;">
+	{% elif tourdetail.teamcount >= 17 and tourdetail.teamcount < 22 %}
+	<canvas id="myCanvasvisible" width="360" height="280" style="border: 1px solid black;">
+	<canvas id="myCanvas" width="900" height="700" style=" border: 1px solid black;">
+	{% elif tourdetail.teamcount >= 22 and tourdetail.teamcount < 25 %}
+	<canvas id="myCanvasvisible" width="360" height="280" style="border: 1px solid black;">
+	<canvas id="myCanvas" width="900" height="700" style=" border: 1px solid black;">
+	{% elif tourdetail.teamcount >= 25 %}
+	<canvas id="myCanvasvisible" width="360" height="280" style="border: 1px solid black;">
+	<canvas id="myCanvas" width="900" height="700" style=" border: 1px solid black;">
+	{% endif %}
+	<script>
+		var results = JSON.parse('{{results|safe}}');
+		var gamename = '{{game.gamename}}';
+		var tourname = '{{tourdetail.tourname}}';
+		DrawTourByMatchAtManage(results, 0, "", gamename, tourname);
+		DrawTourByMatchAtManage(results, 1, "", gamename, tourname);
+	</script>
+	{% endif %}
+</div>
+{% if matches %}
+<div data-role="content" class="ui-content">
+	<div class="myMatchList" align="center">
+		<form enctype="multipart/form-data" method="POST">
+			<table class="myMatchTable" border="1px">
+				<tr>
+					<th class="matchId">No.</th>
+					<th colspan="5">매치</th>
+				</tr>
+				{% for match in matches %}
+				<tr>
+					<td class="matchId"><span>{{match.matchid}}</span></td>
+					<td class="playerNameA">
+						{% if match.team_a == match.winner %}
+						<div class="winner">{{match.team_a_obj.teamname}}</div></td>
+						{% else %}
+						<div class="player">{{match.team_a_obj.teamname}}</div></td>
+						{% endif %}
+					<td class="score"><span><input type="number" readonly="readonly" value={{match.team_a_score}} pattern="[0-9]*" id="score" maxlength = "2" min = "0" max = "99"/></span></td>
+					<td class="versus">VS</td>
+					<td class="score"><span><input type="number" readonly="readonly" value={{match.team_b_score}} pattern="[0-9]*" id="score" maxlength = "2" min = "0" max = "99"/></span></td>
+					<td class="playerNameB">
+						{% if match.team_b == match.winner %}
+						<div class="winner">{{match.team_b_obj.teamname}}</div></td>
+						{% else %}
+						<div class="player">{{match.team_b_obj.teamname}}</div></td>
+						{% endif %}
+				</tr>
+				{% endfor %}
+			</table>
+		</form>
+	</div>
+</div>
+{% endif %}
+{% endblock %}

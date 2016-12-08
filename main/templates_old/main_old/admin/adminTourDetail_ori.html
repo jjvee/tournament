@@ -1,0 +1,152 @@
+{% extends "main/base.html" %}
+{% block title %}
+{{tour.tourname}}
+{% endblock %}
+
+{% block content %}
+
+{% for match in matchcnt %}
+<script>var matchCnt = '{{match}}';</script>
+{% endfor %}
+
+<script>
+	function setTourDetail(gameId, tourId, matchCnt) {
+		var tourList = [];
+		
+		for(var i=1; i<=matchCnt; i++) {
+			var middle = [];
+			middle['matchId'] = i;
+			middle['team_a'] = $('#' + i + '_team_a').val();
+			middle['team_b'] = $('#' + i + '_team_b').val();
+			
+			if (middle['team_a'] == 'init' || middle['team_b'] == 'init') {
+				alert('팀을 반드시 선택 해야합니다(' + i + '번 매치)');
+				return false;	
+			}
+			
+			if (middle['team_a'] == middle['team_b']) {
+				alert('한 매치에 같은 팀을 입력할 수 없습니다(' + i + '번 매치)');
+				return false;
+			}
+			
+			for(var j=0; j<tourList.length; j++) {
+				if(middle['team_a'] == tourList[j]['team_a']
+				|| middle['team_a'] == tourList[j]['team_b']
+				|| middle['team_b'] == tourList[j]['team_a']
+				|| middle['team_b'] == tourList[j]['team_b']) {
+					j = j + 1;
+					alert('팀을 중복 등록할 수 없습니다('+ i + '번매치,' + j + '번매치)');
+					return false;
+				}
+			}
+			
+			tourList.push(middle);
+		}
+		
+		console.log(tourList);
+	}
+	
+	$(function() {
+		$('#setTourDetail').click(function(event) {
+			event.preventDefault();
+			
+			var gameId = '{{game.gameid}}';
+			var tourId = '{{tour.tourid}}';
+			setTourDetail(gameId, tourId,matchCnt);
+		});
+	});
+</script>
+<style>
+    .myMatchList .myMatchTable{width: 100%; text-align:center; border-collapse: collapse; border:1px solid #d0d0d0; font-size:12px}
+	.myMatchList .myMatchTable tr th{background-color: #86BCCB; padding: 10px; color:#FFFFFF}
+	.myMatchList .myMatchTable tr td{padding: 5px;}
+	.myMatchList .myMatchTable tr td.matchId{width:5px}
+	.myMatchList .myMatchTable tr td.team_a{border-left:0px; border-right:0px; padding-left:0px; text-align:center}
+	.myMatchList .myMatchTable tr td.team_b{border-left:0px; padding-left:0px; padding-right:0px; text-align:center;}
+	.myMatchList .myMatchTable tr td.score{padding-left:0px; padding-right:0px; border-left:0px; border-right:0px; margin:auto; width:50px;}
+	.myMatchList .myMatchTable tr td.versus{border-left:0; border-right:0; font-size:13px; font-weight:bold; color:#CC0000; padding:0px}
+</style>
+
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+      <ul>
+        <li><a href='/adminGame/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">기본정보</span></a></li>
+			  <li><a href='/adminTour/{{game.gameid}}/' class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href='/adminTourResult/{{game.gameid}}/init/' rel="external", data-ajax="false"><span id="navText">결과입력</span></a></li>
+  		</ul>
+  	</div>				
+</div>
+
+<div data-role="main" class="ui-content">
+	<div class="myMatchList" align="center">
+		<h2><b>{{tour.tourname}}</b></h2>
+	  	<form enctype="multipart/form-data" method="POST" id="tourDetail">
+	  		<table class="myMatchTable" border="1px">
+				<tr>
+					<th class="matchId">No.</th>
+					<th colspan="4">매치</th>
+				</tr>
+		
+				{% for match in matchcnt %}
+				<tr>
+					<td class="matchId"><span>{{match}}</span></td>
+					<td class="team_a">
+					    <select id="{{match}}_team_a" data-theme="c">
+					    	<option id="init" name="init" value="init">-팀을 선택하세요-</option>
+					        {% for team in teamlist %}
+					        {% if team.matchid == match and team.teamside == 'a' %}
+					        <option selected="selected" id='{{match}}_a' name='{{match}}_a' value="{{team.teamid}}">{{team.teamname}}</option>
+					        {% else %}
+					        <option id='{{match}}_a' name='{{match}}_a' value="{{team.teamid}}">{{team.teamname}}</option>
+					        {% endif %}
+					        {% endfor %}
+					    </select>
+					</td>
+				    <td class="versus">VS</td>
+					<td class="team_b">
+					    <select id="{{match}}_team_b" data-theme="c">
+					    	<option id="init" name="init" value="init">-팀을 선택하세요-</option>
+					        {% for team in teamlist %}
+					        {% if team.matchid == match and team.teamside == 'b' %}
+					        <option selected="selected" id='{{match}}_b' name='{{match}}_b' value="{{team.teamid}}">{{team.teamname}}</option>
+					        {% else %}
+					        <option id='{{match}}_b' name='{{match}}_b' value="{{team.teamid}}">{{team.teamname}}</option>
+					        {% endif %}
+					        {% endfor %}
+					    </select>
+					</td>		
+				</tr>
+				{% endfor %}
+			</table>
+			
+			<h2><b>부전승</b></h2>
+			<table class="myMatchTable" border="1px">
+				<tr>
+					<th class="matchId">No.</th>
+					<th colspan="1">팀</th>
+				</tr>
+				
+				{% for byematch in byecnt %}
+				<tr>
+					<td class="matchId"><span>{{byematch}}</span></td>
+					<td class="team_bye">
+						<select id="{{byematch}}_team_bye" data-theme="c">
+							<option id="init" name="init" value="init">-팀을 선택하세요-</option>
+							{% for team in teamlist %}
+					        {% if team.matchid == match and team.teamside == 'b' %}
+					        <option selected="selected" id='{{byematch}}_bye' name='{{byematch}}_bye' value="{{team.teamid}}">{{team.teamname}}</option>
+					        {% else %}
+					        <option id='{{byematch}}_bye' name='{{byematch}}_bye' value="{{team.teamid}}">{{team.teamname}}</option>
+					        {% endif %}
+					        {% endfor %}
+						</select>
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+			<input type="submit" id="setTourDetail" value="저장">
+		</form>
+	</div>
+</div>
+
+{% endblock %}

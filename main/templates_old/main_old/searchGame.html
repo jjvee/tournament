@@ -1,0 +1,23 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+{% block content %}
+<div data-role="main" class="ui-content">
+	<form action="/searchGame/" method="POST">
+		{% csrf_token %}
+		<input type="search" name="gameName" placeholder="대회명"/>
+		<input type="submit" value="검색" data-theme="b"/>
+	</form>
+	<ul id="GameList" data-role="listview" data-inset="true" data-theme="c">
+		{% for game in games %}
+			<li><a href="/gameMain/{{game.gameid}}/" rel="external">
+				<h1>{{game.gamename}}</h1>
+				<p>{{game.region}}/{{game.owner}}</p>
+				<p>{{game.begindate}} ~ {{game.enddate}}</p>
+			</a></li>
+		{% endfor %}
+	</ul>
+</div>
+{% endblock %}

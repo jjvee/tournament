@@ -1,0 +1,22 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+{% block content %}
+<div data-role="main" class="ui-content">
+	<form action = "/createGame/" method="post">
+        {% csrf_token %}
+        <button class="btn btn-warning btn-block" name="createGame" data-theme="e">신규대회생성</button>
+    </form>
+	<ul id="GameList" data-role="listview" data-inset="true" data-theme="c">
+		{% for game in games %}
+			<li><a href="/adminGame/{{game.gameid}}/" rel="external">
+				<h1>{{game.gamename}}</h1>
+				<p>{{game.region}}/{{game.owner}}</p>
+				<p>{{game.begindate}} ~ {{game.enddate}}</p>
+			</a></li>
+		{% endfor %}
+	</ul>
+</div>
+{% endblock %}

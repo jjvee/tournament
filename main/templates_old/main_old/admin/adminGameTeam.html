@@ -1,0 +1,45 @@
+
+{% extends "main/base.html" %}
+{% block title %}
+대회메인
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+
+<style>
+	#navText{font-size: 12px;}
+</style>
+
+<div data-role="header" data-theme="b">
+    <div data-role="navbar">
+      <ul>
+        <li><a href='/adminGame/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">기본정보</span></a></li>
+			  <li><a href='/adminTour/{{game.gameid}}/' rel="external", data-ajax="false"><span id="navText">토너먼트</span></a></li>
+		    <li><a href='/adminTourResult/{{game.gameid}}/init/' rel="external", data-ajax="false"><span id="navText">결과입력</span></a></li>
+		    <li><a href='/adminGameTeam/{{game.gameid}}/' class="ui-btn-active" rel="external", data-ajax="false"><span id="navText">선수관리</span></a></li>
+  		</ul>
+  	</div>				
+</div>
+
+<div data-role="main" class="ui-content">
+    <form action = "/addTeam/{{game.gameid}}/" method="post">
+        {% csrf_token %}
+        <button class="btn btn-warning btn-block" name="addTeam" data-theme="a">참가팀추가</button>
+    </form>
+    <form action = "/deleteTeam/{{game.gameid}}/" method="post">
+        {% csrf_token %}
+        <button class="btn btn-warning btn-block" name="deleteTeam" data-theme="d">참가팀삭제</button>
+    </form>
+    <ul id="teamList" data-role="listview" data-inset="true" data-theme="c">
+		{% for team in teams %}
+		<li><a href="#">
+			<h1>{{team.teamname}}</h1>
+			<p>{{team.teamid}}</p>
+		</a></li>
+		{% endfor %}
+	</ul>
+</div>
+
+{% endblock %}

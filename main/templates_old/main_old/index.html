@@ -1,0 +1,54 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+{% block content %}
+{% load static %}
+<div data-role="main" class="ui-content">
+				
+				<div data-role="content" class="ui-content">
+					<table id="mainLogoArea">
+						<tr>
+							<td>
+								<img src="{% static "img/logo/mintonz_logo_black.png" %}">
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-theme="b" data-content-theme="c">
+					<h4>대회</h4>
+					<ul data-role="listview">
+						<li>
+							<a href="searchGame" rel="external", data-ajax="false">대회검색</a>
+						</li>
+						<li>
+							<a href="searchAdminGame" rel="external", data-ajax="false">대회관리</a>
+						</li>
+					</ul>
+				</div>
+
+				<div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-theme="b" data-content-theme="c">
+					<h4>커뮤니티</h4>
+					<ul data-role="listview">
+						<li>
+							<a href="/boardList/notice/all" rel="external", data-ajax="false">공지사항</a>
+						</li>
+						<li>
+							<a href="/boardList/free/all" rel="external", data-ajax="false">자유게시판</a>
+						</li>
+						<li>
+							<a href="/boardList/qna/all" rel="external", data-ajax="false">Q&A</a>
+						</li>
+					</ul>
+				</div>
+
+			</div>
+
+			<!--<div data-role="footer" data-position="fixed" data-theme="b">-->
+
+			<!--	<h1>Gorani Dev.</h1>-->
+
+			<!--</div>-->
+{% endblock %}

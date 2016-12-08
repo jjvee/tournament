@@ -1,0 +1,33 @@
+{% extends "main/base.html" %}
+{% block title %}
+Mintonz
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<style>
+	/*#GamePoster{width: inherit; margin: 0 auto; text-align: center; padding: 5px; background-color: #FFFFFF}*/
+	/*#GamePoster{max-width: 200px; height: auto;}*/
+</style>
+
+<div class="container">
+    <ol class="breadcrumb">
+        <li class="active"><a href="/gameMain/{{game.gameid}}/"><b>대회메인</b></a></li>
+        <li><a href="/tourMain/{{game.gameid}}/">토너먼트</a></li>
+        <li><a href="/boardList/game/{{game.gameid}}/">게시판</a></li>
+    </ol>
+
+	<div><h2>{{game.gamename}}</h2></div>
+    
+    <div class="row">
+        <div class="col-md-4" align="center">
+            <img id="GamePoster" class="img-thumbnail" width="304" height="auto" src="/{{ game.poster }}">
+        </div>
+        <div class="col-md-4">
+            {{game.gamename}}
+        </div>
+	</div>
+
+</div>
+{% endblock %}

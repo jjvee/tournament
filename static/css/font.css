@@ -1,0 +1,21 @@
+@font-face{
+	font-family:'BMJUA';
+	src:url(font/BMJUA_ttf.ttf) format('truetype');
+}
+
+@font-face{
+	font-family:'tvn_light';
+	src:url(font/tvn_light.ttf) format('truetype');
+}
+
+@font-face{
+	font-family:'tvn_medium';
+	src:url(font/tvn_medium.ttf) format('truetype');
+}
+
+@font-face{
+	font-family:'tvn_bold';
+	src:url(font/tvn_bold.ttf) format('truetype');
+}
+
+#headerLogo{width:100px}

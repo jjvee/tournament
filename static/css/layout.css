@@ -1,0 +1,135 @@
+/*
+ * 
+ */
+@font-face{
+	font-family:'NanumBarunGothic';
+	font-style:normal;
+	font-weight:300;
+	src:url(//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWebLight.eot);
+	src:url(//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWebLight.eot?#iefix) format('embedded-opentype'),
+		url(//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWebLight.woff) format('woff'),
+		url(//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWebLight.ttf) format('truetype');
+}
+
+/* --------------------------------------------
+ * layout
+/* ------------------------------------------ */
+div#wrapper {height:100%; min-width:1080px;}
+div#wrapper header#header {position:relative; border-bottom:1px solid #c8c8c8;background:#23B300;width:100%; height:70px;text-align:center;}
+div#wrapper div#container {width:100%; min-height:100%; margin: /*-71px 0 -51px*/; background-color: #FFFFFF; line-height:1.4}
+div#wrapper div#container section#contents{width:984px; margin:0 auto;}
+div#wrapper div#container section#contents header.title {width:100%;position:relative;padding:70px 0 0;color:#333;z-index:1}
+div#wrapper div#container section#contents header.title h1 {font-family:NanumBarunGothic;font-size:36px;font-weight:normal;min-height:48px;letter-spacing:-1px;line-height:44px;}
+div#wrapper div#container section#contents article.article-default {width:100%;min-height:100%;overflow:hidden;}
+div#wrapper footer#footer {border-top:1px solid #c8c8c8; height:50px; background:#23B300;}
+div.footer {position:relative;padding-top:10px;width:984px;margin:0 auto;text-align:left !important; color:white;font-weight:bold;z-index:20}
+
+/* --------------------------------------------
+ *  header
+/* ------------------------------------------ */
+div.header-area{width:984px;margin:0 auto;position:relative;padding-top:11px;z-index:20;clear:both;}
+div.header-area h1.logo{float:left}
+
+#nav {float:right;margin-top:2px;padding-left:38px;}
+#nav ul li{float:left;}
+#nav li {float:left;;position:relative;display:inline-block;}
+#nav li a {position:relative;display:block;padding:15px 0px 17px;height:27px;}
+#nav li ul {display:none;position:absolute;top:58px;left:4px;width:155px;}
+
+#nav-mid {list-style-type: none;margin-bottom:50px;padding: 0;overflow: hidden;border: 1px solid #e7e7e7;background-color: #f3f3f3}
+#nav-mid li {float: left;}
+#nav-mid li a {display: block;color: #666;text-align: center;padding: 14px 16px;text-decoration: none}
+#nav-mid li a:hover:not(.active) {background-color: #ddd}
+#nav-mid li a.active {color: white;background-color: #1abc9c}
+
+.loginLogo { width: 120px; cursor: pointer }
+/* --------------------------------------------
+ * header
+/* ------------------------------------------ */
+header.title p.desc {font-size:14px;line-height:20px;}
+header.title .selection {position:absolute;right:0;top:40px;}
+
+/* --------------------------------------------
+ * common
+/* ------------------------------------------ */
+html, body {width:100%;height:100%}
+body {font-family:Dosis, 'Malgun Gothic', MalgunGothic, '���� ���', '�� ��', Dotum, Arial, Helvetica, sans-serif;font-size:15px;color:#000000;background:#eee; z-index: 10;}
+html,body,div,span,object,iframe,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,
+sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,
+figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video,h1,h2,h3,h4,h5,h6 {margin:0;padding:0;list-style:none;}
+
+
+
+
+
+.menuLink {
+	text-decoration: none;
+	color: #FFFFFF;
+	display: block;
+	width: 150px;
+	font-size: 16px;
+	font-weight:bold;
+	font-family: NanumBarunGothic;
+}
+
+.submenuLink { 
+	text-decoration: none;
+ 	background-color: #EBEDEF;
+ 	float:left;
+ 	color: #000000;
+	display: block;
+	width: 150px;
+	line-height: 27px;
+	font-size: 13px;
+	font-weight: bold;
+	font-family: NanumBarunGothic;
+}
+
+.menuLink:hover {
+	font-size:17px;
+}
+
+.submenuLink:hover { 
+ 	background-color: #C8C8C8;
+}
+
+.checkboxes label {
+    display: block;
+    float: left;
+    padding-right: 20px;
+    padding-left: 22px;
+    text-indent: -22px;
+}
+
+#GameGeneralInfo {border-collapse: collapse; background-color: #FFFFFF; border:1px solid #d0d0d0 }
+#GameGeneralInfo tr th{text-align: left; background-color: #BDBDBD; padding: 5px}
+#GameGeneralInfo tr td{padding: 5px}
+
+#GameStatusTable {padding-right: 20px; padding-top: 10px;}
+
+#GameStatusByClass {border-collapse: collapse; background-color: #FFFFFF; border:1px solid #d0d0d0 }
+#GameStatusByClass tr th{text-align: center; background-color: #BDBDBD; padding: 10px; width:30px;}
+#GameStatusByClass tr td{text-align: center; width:30px; padding: 10px;}
+
+#GameStatusByClub {border-collapse: collapse; background-color: #FFFFFF; border:1px solid #d0d0d0 }
+#GameStatusByClub tr th{text-align: center; background-color: #BDBDBD; padding: 10px; }
+#GameStatusByClub tr th2{text-align: center; background-color: #BDBDBD; padding: 10px; }
+#GameStatusByClub tr td{text-align: center; padding: 10px; white-space: nowrap;}
+
+#GameStatusByList {border-collapse: collapse; border:1px solid #d0d0d0}
+#GameStatusByList tr th{text-align: center; background-color: #BDBDBD;  padding: 10px; }
+#GameStatusByList tr td{text-align: center; background-color: #FFFFFF; padding: 10px; }
+
+
+#teamA {border-right:0px;}
+#teamB {border-left:0px;}
+#vs {border-left:0px; border-right:0px;}
+#navGameMain li{display:inline-block;}
+
+#sum {background-color: #EAEAEA;}
+#finalSum {background-color: #CEFBC9;}
+
+#poster img{width: auto; height: 213px;}
+#mainwallpaper{width:100%; height:auto}
+
+#board{margin: 0 auto; width:100%; height:600px }
