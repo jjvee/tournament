@@ -87,11 +87,11 @@ WSGI_APPLICATION = 'tournament.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'c9',
-        'USER': 'locosjjv',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'NAME': 'tournament',
+        'USER': 'admin',
+        'PASSWORD': 'roland305',
+        'HOST': 'touraws.cmwcdntyrrjs.ap-northeast-2.rds.amazonaws.com',
+        'PORT': '3306',
     }
 }
 
