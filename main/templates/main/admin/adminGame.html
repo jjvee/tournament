@@ -5,9 +5,14 @@ Mintonz
 
 
 {% block content %}
+<style>
+  #modifyGamePosterModal{vertical-align:bottom;}
+</style>
 <script>
     $(function() {
-    	
+      
+      $('#gameid').val('{{game.gameid}}');
+      $('#gameidposter').val('{{game.gameid}}');
     	$('#gamename').val('{{game.gamename}}');
     	$('#region').val('{{game.region}}');
     	$('#owner').val('{{game.owner}}');
@@ -19,37 +24,36 @@ Mintonz
       $('#modifyGame').click(function(event) {
           event.preventDefault();
           
-          var gameid = '{{game.gameid}}';
-          var gamename = $('#gamename').val();
-          var region = $('#region').val();
-          var owner = $('#owner').val();
-          var entryfee = $('#entryfee').val();
-          var begindate = $('#begindate').val();
-          var enddate = $('#enddate').val();
-          var stadium = $('#stadium').val();
+          if ($('#gamename').val() == '') {
+                alert('대회명은 필수입니다');
+                return false;
+            };
           
-          if (gamename == '') {
-              alert('대회명은 필수입니다');
-              return false;
-          };
+          if ($('#begindate').val() == '') {
+                alert('개최일은 필수입니다');
+                return false;
+            };
+            
+            if ($('#enddate').val() == '') {
+                alert('종료일은 필수입니다');
+                return false;
+            };
+            
+            if (confirm("대회정보를 수정 하시겠습니까?") == false) {
+                return false;
+            }
+            
+            var data = new FormData($('#modifyGameForm').get(0));
           
           $.ajax({
           			type : 'POST',
           			url : '/modifyGame/',
-          			data : {
-          			  gameid : gameid,
-          				gamename : gamename,
-          				region : region,
-          				owner : owner,
-          				entryfee : entryfee,
-          				begindate : begindate,
-          				enddate : enddate,
-          				stadium : stadium,
-          				"csrfmiddlewaretoken": "{{ csrf_token }}",
-          			}
+          			enctype : "multipart/form-data",
+      				  processData: false,
+                contentType: false,
+          			data : data,
         		  	}).done(function(responseText) {
             		    if (responseText) {
-            		        alert('대회정보 변경을 완료 하였습니다');
             		        var url = '/adminGame/' + responseText;
               		      location.href = url;
             		    }
@@ -59,6 +63,42 @@ Mintonz
         			  }).error(function(request, status, error) {
         			    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
         			  });
+      });
+      
+      $('#modifyGamePoster').click(function(event) {
+          event.preventDefault();
+ 
+          var data = new FormData($('#modifyGamePosterForm').get(0));
+          
+          if ($('#poster').val() == '') {
+            alert("포스터를 선택해야 수정이 가능합니다");
+          }
+          
+          $.ajax({
+          			type : 'POST',
+          			url : '/modifyGamePoster/',
+          			enctype : "multipart/form-data",
+      				  processData: false,
+                contentType: false,
+          			data : data,
+        		  	}).done(function(responseText) {
+            		    if (responseText) {
+            		      alert("포스터 수정을 완료하였습니다")
+            		      $("#closeModal").trigger("click");
+            		      var url = '/adminGame/' + responseText;
+              		    location.href = url;
+            		    }
+            		    
+        			  }).always(function() {
+        			
+        			  }).error(function(request, status, error) {
+        			    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+        			  });
+      });
+      
+      $('#modifyGamePosterModal').click(function(event) {
+          event.preventDefault();
+          $('#poster').val('');
       });
       
       $('#deleteGame').click(function(event) {
@@ -101,9 +141,15 @@ Mintonz
     
     <div><h2>기본정보</h2></div>
     <br>
+    <img id="GamePoster" class="img-thumbnail" width="200" height="auto" src="/{{ game.poster }}">
+    <button type="button" class="btn btn-info" data-toggle="modal" id="modifyGamePosterModal" data-target="#changePoster">포스터수정</button>
+    <br>
     
-    <form action = "/modifyGame/" method="post">
+    <form action = "/modifyGame/" id="modifyGameForm" method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        <div class="form-group">
+          <input type="hidden" class="form-control" id="gameid" name="gameid">
+        </div>
         <div class="form-group">
           <label for="gamename">대회명</label>
           <input type="text" class="form-control" id="gamename" name="gamename">
@@ -132,9 +178,42 @@ Mintonz
           <label for="stadium">대회장소</label>
           <input type="text" class="form-control" id="stadium" name="stadium">
         </div>
-        <button type="submit" class="btn btn-primary btn-block" id="modifyGame" name="modifyGame">정보수정</button>
+        <button type="button" class="btn btn-primary btn-block" id="modifyGame" name="modifyGame">정보수정</button>
         <button type="button" class="btn btn-warning btn-block" id="deleteGame" name="deleteGame">대회삭제</button>
     </form>
     <br>
+    
+  <!-- Modal -->
+    <div class="modal fade" id="changePoster" role="dialog">
+      <div class="modal-dialog">
+      
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">포스터수정</h4>
+          </div>
+          <div class="modal-body">
+            <form action = "/modifyGamePoster/" id="modifyGamePosterForm" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="form-group">
+                <input type="hidden" class="form-control" id="gameidposter" name="gameidposter">
+              </div>
+              <div class="form-group">
+                <label for="file">대회 포스터</label>
+                <input type="file" id="poster" name="poster" accept="image/*">
+                <p class="help-block">이미지만 가능합니다</p>
+              </div>
+              <!--<button type="button" class="btn btn-primary btn-block" id="createNewGame" name="createNewGame">생성</button>-->
+          </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" id="modifyGamePoster" name="modifyGamePoster">완료</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="closeModal">취소</button>
+          </div>
+        </div>
+        
+      </div>
+    </div>    
 </div>
 {% endblock %}

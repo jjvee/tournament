@@ -14,6 +14,7 @@ Mintonz
     {% endif %}
     
     <div><h2>{{boardtypetext}}</h2></div>
+    <br>
     {% if boardtype == 'notice' %}
 		{% if request.user.is_staff == True %}
 		<button type="button" name="boardwrite" value="새글작성" class="btn btn-primary btn-block" onclick="location.href='/boardWrite/{{boardtype}}/{{gameid}}'">새글작성</button>

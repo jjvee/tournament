@@ -18,14 +18,31 @@ Mintonz
         <li><a href="/boardList/game/{{game.gameid}}/">게시판</a></li>
     </ol>
 
-	<div><h2>{{game.gamename}}</h2></div>
-    
+	<div><h2>대회메인</h2></div>
+    <br>
     <div class="row">
-        <div class="col-md-4" align="center">
+        <div class="col-md-4" align="left">
             <img id="GamePoster" class="img-thumbnail" width="304" height="auto" src="/{{ game.poster }}">
         </div>
-        <div class="col-md-4">
-            {{game.gamename}}
+        <div class="col-md-5">
+            <table class="table">
+                <tr>
+                    <th>대회명</th>
+                    <td>{{game.gamename}}</td>
+                </tr>
+                <tr>
+                    <th>지역</th>
+                    <td>{{game.region}}</td>
+                </tr>
+                <tr>
+                    <th>개최자</th>
+                    <td>{{game.owner}}</td>
+                </tr>
+                <tr>
+                    <th>대회일정</th>
+                    <td>{{begindate}}~{{enddate}}</td>
+                </tr>
+            </table>
         </div>
 	</div>
 

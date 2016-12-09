@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^manageGame/$', views.manageGame),
     url(r'^createGame/$', views.createGame),
     url(r'^modifyGame/$', views.modifyGame),
+    url(r'^modifyGamePoster/$', views.modifyGamePoster),
     url(r'^deleteGame/$', views.deleteGame),
     url(r'^adminGame/(?P<game_id>.+)/$', views.adminGame),
     url(r'^adminGameTeam/(?P<game_id>.+)/$', views.adminGameTeam),

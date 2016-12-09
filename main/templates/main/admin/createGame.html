@@ -18,8 +18,18 @@ Mintonz
             // var enddate = $('#enddate').val();
             // var stadium = $('#stadium').val();
             
-            if (gamename == '') {
+            if ($('#gamename').val() == '') {
                 alert('대회명은 필수입니다');
+                return false;
+            };
+            
+            if ($('#begindate').val() == '') {
+                alert('개최일은 필수입니다');
+                return false;
+            };
+            
+            if ($('#enddate').val() == '') {
+                alert('종료일은 필수입니다');
                 return false;
             };
             

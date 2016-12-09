@@ -127,6 +127,19 @@ def modifyGame(request):
     return HttpResponse(gameid)
 
 @login_required
+def modifyGamePoster(request):
+    gameid = request.POST.get('gameidposter')
+    poster = request.FILES.get('poster')
+
+    game = Game.objects.get(gameid = gameid)
+    
+    game.poster = poster
+    
+    game.save()
+
+    return HttpResponse(gameid)
+
+@login_required
 def deleteGame(request):
     gameid = request.POST.get('gameid')
     game = Game.objects.get(gameid = gameid)
@@ -171,7 +184,10 @@ def searchAdminGame(request):
     
 def gameMain(request, game_id):
     game = Game.objects.get(gameid = game_id)
-    context = {'game':game}
+    begindate = str(game.begindate)
+    enddate = str(game.enddate)
+    print begindate
+    context = {'game':game, 'begindate':begindate, 'enddate':enddate}
     return render(request, 'main/gameMain.html', context)
     
 def tourMain(request, game_id):
